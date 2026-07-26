@@ -326,16 +326,47 @@ header{position:sticky;top:0;z-index:40}
   a[href]:after{content:""}
 }
 
-@media (max-width:640px){
-  .navbar{flex-wrap:wrap;gap:12px}
-  .logo{flex:none;white-space:nowrap}
-  nav.main{flex-basis:100%;margin-left:0;gap:14px;row-gap:8px}
-  .hero h1{font-size:26px}
-}
 @media (max-width:520px){
   .cright{flex-direction:row;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end}
   label.crs{flex-wrap:wrap}
   .cmain{flex-basis:100%}
+}
+
+/* ===== Mobile nav: hamburger + dropdown sheet (replaces the wrapping link row) ===== */
+.navtoggle{display:none}
+@media (max-width:760px){
+  .navbar{flex-wrap:wrap;gap:10px 12px;padding:11px 0}
+  .logo{flex:1;min-width:0;white-space:nowrap}
+  .navtoggle{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;flex:none;padding:0;
+    border:1px solid var(--line2);border-radius:var(--radius-sm);background:var(--card);color:var(--ink);cursor:pointer;
+    box-shadow:var(--shadow-xs);transition:background .15s ease,border-color .15s ease}
+  .navtoggle:hover{background:var(--hover);border-color:var(--ink3)}
+  .navtoggle .ic-close{display:none}
+  header.navopen .navtoggle .ic-open{display:none}
+  header.navopen .navtoggle .ic-close{display:inline}
+  /* the link sheet: full-width, in flow below the bar, so the sticky header just grows */
+  nav.main{display:none;order:3;flex-basis:100%;flex-direction:column;gap:0;margin:4px -4px 2px}
+  header.navopen nav.main{display:flex;animation:navsheet .18s cubic-bezier(.2,.8,.2,1) both}
+  nav.main a{padding:13px 8px;font-size:15px;color:var(--ink2);border-top:1px solid var(--line)}
+  nav.main a:first-child{border-top:0}
+  nav.main a:hover{color:var(--ink)}
+}
+@keyframes navsheet{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+@media (prefers-reduced-motion:reduce){header.navopen nav.main{animation:none}}
+
+/* ===== Mobile polish: hero, guide, week grid ===== */
+@media (max-width:640px){
+  .hero{padding:22px 0 34px}
+  .hero h1{font-size:27px}
+  /* Guide: label + text flow, then a full-width action button — no cramped side-by-side */
+  .guide .btn{flex-basis:100%}
+}
+@media (max-width:560px){
+  /* Fit more of the week on screen: slimmer time column, tighter cells */
+  table.wk{min-width:472px}
+  table.wk tbody th{width:58px;font-size:10px;padding:7px 6px}
+  td.c{height:52px}
+  .bk .a{font-size:10.5px}
 }
 </style>
 </head>
@@ -344,7 +375,11 @@ header{position:sticky;top:0;z-index:40}
 <header class="noprint">
   <div class="wrap navbar">
     <a class="logo" href="#"><span class="logomark">EM</span> Course Planner</a>
-    <nav class="main">
+    <button class="navtoggle" id="navtoggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="navmain">
+      <svg class="ic-open" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+      <svg class="ic-close" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+    </button>
+    <nav class="main" id="navmain">
       <a href="#how">Register in AIMS</a>
       <a href="#faults">Where AIMS trips you up</a>
       <a href="#calendar">Calendar</a>

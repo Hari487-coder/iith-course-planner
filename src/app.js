@@ -886,6 +886,19 @@ function scriptText(){
 })();
 
 /* ---------- wiring ---------- */
+/* Mobile nav: hamburger toggles the link sheet; it closes on link tap,
+   Escape, or a tap outside the header. Desktop nav is untouched (CSS-gated). */
+(function mobileNav(){
+  var t=document.getElementById("navtoggle"),
+      h=document.querySelector("header"),
+      n=document.getElementById("navmain");
+  if(!t||!h||!n) return;
+  function set(open){ h.classList.toggle("navopen",open); t.setAttribute("aria-expanded",String(open)); }
+  t.addEventListener("click",function(){ set(!h.classList.contains("navopen")); });
+  n.addEventListener("click",function(e){ if(e.target.closest("a")) set(false); });
+  document.addEventListener("keydown",function(e){ if(e.key==="Escape") set(false); });
+  document.addEventListener("click",function(e){ if(!h.contains(e.target)) set(false); });
+})();
 document.getElementById("btnscript").addEventListener("click",function(){ copy(scriptText(), this); });
 var bc=document.getElementById("btncal");
 if(bc) bc.addEventListener("click",function(){
