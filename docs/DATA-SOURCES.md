@@ -99,6 +99,34 @@ sources, because IITH reuses course codes across years:
 - **ET5020** — the course exists in the Energy Science M.Tech, but no IITH page
   publishes this code for it.
 
+## Engineering-elective credits, verified per course
+
+The engineering elective must be a single **3-credit** course, so a course's credit
+count decides whether a student may pick it. 37 catalogue courses were shown with
+"cr ?" (credits unpublished in the timetable). Each was re-verified against its own
+department's official course listing and the credit and eligibility set accordingly.
+Only courses whose **code and title both matched** the official source were changed;
+where a title differed between the 2026 timetable and the department catalogue (code
+reused across years), the course was left as "confirm in AIMS" rather than risk a
+wrong credit.
+
+Confirmed **3 credits → eligible**: EE5110, EE5183, EE5193, EE5200, EE5210, EE5230,
+EE5240, EE5350, EE5540, EE5552, EE5610, EE5670, EE5750, EE5817, EE5900, EE6190,
+EE6307, EE6380 (per-course pages at `ee.iith.ac.in/Courses/`); CH5010, CH5050, CH5060
+(`che.iith.ac.in` M.Tech curriculum PDF); CS5060, CS5600, CS5610, CS6160, CS6843 (the
+CSE 5-/6-level elective sheets linked from `cse.iith.ac.in/academics/courses.html`);
+BT6390 (Biotechnology M.Tech curriculum).
+
+Confirmed **not 3 credits → cannot be the engineering elective**: EE5033 (2), EE5604
+(1), EE5848 (2); CH5460 (1), CH6580 (2), CH6620 (1), CH6870 (1); BT5060 (2), BT6040
+(1), BT6060 (2), BT6113 (2), BT6143 (2), BT6303 (2). These now show their real credit
+weight and are flagged "not a 3-credit course".
+
+Left as "cr ? — confirm in AIMS" (title conflict or not found in the official listing):
+EE5170, EE5480, EE5490 (2026 timetable title differs from the EE catalogue); CH6080
+(catalogue title differs); AI5040, CS5013, CS5103, CS5363, CS5903, CS6113, SE5500,
+SE5723, and the remaining CH5xxx codes absent from the published ChE lists.
+
 ## Corrections applied after publication
 
 - **EM5270 Entrepreneurial Marketing** and **LA1260 Fundamentals of Organizational
