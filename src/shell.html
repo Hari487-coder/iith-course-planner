@@ -271,6 +271,20 @@ header{position:sticky;top:0;z-index:40}
 .rsrow .t{flex:1;min-width:0;color:var(--ink2)}
 .rsrow .s{flex:none;font-family:var(--mono);font-size:12px;color:var(--ink3)}
 
+/* ---------- active next-step guide (turns the readiness strip into a wizard) ---------- */
+.guide{display:flex;align-items:center;gap:12px 14px;flex-wrap:wrap;margin-top:14px;padding-top:14px;border-top:1px solid var(--line)}
+.guide .glabel{flex:none;font-size:10px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;
+  padding:3px 10px;border-radius:var(--radius-pill);background:var(--brand-wash);color:var(--brand-text);border:1px solid var(--brand-line)}
+.guide.good .glabel{background:var(--good-wash);color:var(--good);border-color:var(--good-line)}
+.guide.bad .glabel{background:var(--bad-wash);color:var(--bad);border-color:var(--bad-line)}
+.guide .gt{flex:1;min-width:180px;font-size:13.5px;color:var(--ink);line-height:1.5}
+.guide.bad .gt{color:var(--bad)}
+.guide .btn{flex:none}
+
+/* ---------- readycard action bar: the AIMS + calendar hand-off ---------- */
+.readyactions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+.readycard .readyhint{margin:12px 0 0;font-size:12.5px;line-height:1.55;color:var(--good);opacity:.85;max-width:70ch}
+
 /* ---------- fractal explainer ---------- */
 .segbar{display:flex;gap:3px;margin:16px 0 8px}
 .segcell{flex:1;background:var(--paper);border:1px solid var(--line);border-radius:5px;
@@ -365,6 +379,7 @@ header{position:sticky;top:0;z-index:40}
       </div>
       <div class="bar"><i id="rbar" style="width:0%"></i></div>
       <div class="rsteps" id="rsteps"></div>
+      <div class="guide" id="guide" aria-live="polite" hidden></div>
     </div>
   </div>
 </section>
@@ -409,6 +424,14 @@ header{position:sticky;top:0;z-index:40}
   <h2>You are ready to register</h2>
   <p id="readytext"></p>
   <div class="readysum" id="readysum"></div>
+  <div class="readyactions">
+    <a class="btn" href="https://aims.iith.ac.in/" target="_blank" rel="noopener">Open AIMS registration &rarr;</a>
+    <button class="btn ghost" id="btnReadyIcs" type="button">Download calendar (.ics)</button>
+    <a class="btn ghost" id="btnReadyGcal" href="https://aims.iith.ac.in/" target="_blank" rel="noopener">Add deadline to Google Calendar</a>
+  </div>
+  <p class="readyhint">The .ics has every class plus the add and drop deadlines, each with a reminder &mdash; it opens in
+    Google, Apple or Outlook Calendar (in Google Calendar: Settings &rarr; Import). The Google button adds the
+    registration-close reminder in one click.</p>
 </div>
 
 <div class="cols">
@@ -466,7 +489,7 @@ header{position:sticky;top:0;z-index:40}
       <div id="printlist"></div>
       <div class="actions noprint">
         <button class="btn ghost" id="btnprint" type="button">Print / save as PDF</button>
-        <button class="btn" id="btncal" type="button">Add to Google Calendar</button>
+        <button class="btn" id="btncal" type="button">Add to calendar (.ics)</button>
         <button class="btn ghost" id="btncopy" type="button">Copy as text</button>
         <button class="btn ghost" id="btnlink" type="button">Copy shareable link</button>
         <button class="btn ghost" id="btnclear" type="button">Clear</button>

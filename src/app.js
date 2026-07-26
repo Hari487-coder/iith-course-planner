@@ -388,7 +388,7 @@ function esc(s){ var d=document.createElement("div"); d.textContent=s; return d.
 
 function sync(){
   renderGroups(); renderElist(); renderWeek(); renderStatus(); renderPrint();
-  renderReadiness(); renderPreflight(); renderReady();
+  renderReadiness(); renderGuide(); renderPreflight(); renderReady();
   var cur=CUR[state.sem], tot=totalCredits();
   var n=$("totn"); n.textContent = (Math.round(tot*100)/100);
   n.className = "n " + (tot===cur.total ? "ok" : tot>cur.total ? "no" : "");
@@ -684,6 +684,79 @@ function renderReadiness(){
   });
 }
 
+/* ---------- active next-step guide ----------
+   The readiness strip shows what is done; this shows what to do next. It
+   reads the plan and states the single next action in one plain line, with
+   a control that jumps to it. Priority: a clash outranks everything (it
+   blocks registration), then the first unfilled requirement group in order,
+   then the Faculty-Advisor confirmation, then the AIMS hand-off. Reuses
+   readiness()/groupCredits() so it can never disagree with the stepper. */
+var GUIDE_NUDGE={
+  core:{start:"Start here — tick your core courses. All of them are compulsory.", more:"Finish ticking your core courses.", to:"pickcard"},
+  mgmt:{start:"Pick your department electives.", more:"Pick your department electives.", to:"pickcard"},
+  eng: {start:"Choose one 3-credit engineering elective from another department.", more:"Choose one 3-credit engineering elective from another department.", to:"esearch"},
+  mand:{start:"Add the mandatory courses for this semester.", more:"Add the mandatory courses for this semester.", to:"pickcard"}
+};
+function guideState(){
+  var r=readiness(), cur=CUR[state.sem];
+  if(r.clashes.length) return {tone:"bad", label:"Fix this",
+    msg:"Two of your courses meet in slot "+r.clashes.join(", ")+". Untick one — no instructor moves a slot for a single student.",
+    cta:"Show the clash", to:"wkcard"};
+  var g=null;
+  for(var i=0;i<cur.groups.length;i++){
+    var gr=cur.groups[i];
+    if(gr.advisory) continue;
+    if(groupCredits(gr.id)!==gr.need){ g=gr; break; }
+  }
+  if(g){
+    var n=GUIDE_NUDGE[g.id]||{start:"Complete "+g.name+".", more:"Complete "+g.name+".", to:"pickcard"};
+    var fresh=r.sel.length===0;
+    return {tone:"", label: fresh?"Start here":"Next step", msg: fresh?n.start:n.more, cta:"Take me there", to:n.to};
+  }
+  if(!manual.fa) return {tone:"", label:"Last step",
+    msg:"Confirm you have spoken to your Faculty Advisor about the engineering elective — the department requires it.",
+    cta:"Go to that step", to:"faack"};
+  return {tone:"good", label:"Ready",
+    msg:"Your plan checks out: every credit filled, no clashes. Open AIMS and copy your rows straight in.",
+    cta:"Open AIMS →", href:"https://aims.iith.ac.in/"};
+}
+function renderGuide(){
+  var host=$("guide"); if(!host) return;
+  var s=guideState();
+  host.hidden=false;
+  host.className="guide"+(s.tone?" "+s.tone:"");
+  host.innerHTML="";
+  host.appendChild(el("span","glabel",s.label));
+  host.appendChild(el("span","gt",s.msg));
+  var btn;
+  if(s.href){
+    btn=document.createElement("a");
+    btn.className="btn sm"; btn.href=s.href; btn.target="_blank"; btn.rel="noopener";
+  } else {
+    btn=document.createElement("button");
+    btn.type="button"; btn.className="btn ghost sm";
+    btn.addEventListener("click",function(){
+      var t=document.getElementById(s.to); if(!t) return;
+      var smooth=!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+      t.scrollIntoView({behavior: smooth?"smooth":"auto", block:"center"});
+      if(s.to==="faack" || s.to==="esearch"){ try{ t.focus({preventScroll:true}); }catch(e){ t.focus(); } }
+    });
+  }
+  btn.textContent=s.cta;
+  host.appendChild(btn);
+}
+/* One genuine click -> the single most critical date lands in Google
+   Calendar. Google's template URL adds one event at a time, so the full
+   timetable plus every deadline stays the job of the .ics (buildICS). */
+function gcalDeadlineLink(){
+  var q=["action=TEMPLATE",
+    "text="+encodeURIComponent("IITH AIMS registration closes (Jul-Nov 2026)"),
+    "dates=20260731/20260801",
+    "ctz=Asia/Kolkata",
+    "details="+encodeURIComponent("Last day to register for JUL26-NOV26 in AIMS, 23:59. Your Faculty Advisor still has to approve after you submit. Added from the IITH EM course planner — verify against AIMS.")];
+  return "https://calendar.google.com/calendar/render?"+q.join("&");
+}
+
 /* ---------- pre-flight script + checklist ---------- */
 var ROWTYPE={core:"Departmental Core Theory", mgmt:"Departmental Elective",
              eng:"Free Elective", mand:"Departmental Core Theory"};
@@ -821,6 +894,14 @@ if(bc) bc.addEventListener("click",function(){
   setTimeout(function(){ self.textContent=o; }, 2600);
 });
 document.getElementById("faack").addEventListener("change",function(){ manual.fa=this.checked; sync(); });
+var bri=document.getElementById("btnReadyIcs");
+if(bri) bri.addEventListener("click",function(){
+  var n=downloadICS(), o=this.textContent, self=this;
+  this.textContent=n+" events downloaded";
+  setTimeout(function(){ self.textContent=o; }, 2600);
+});
+var brg=document.getElementById("btnReadyGcal");
+if(brg) brg.href=gcalDeadlineLink();
 document.getElementById("edept").addEventListener("change",renderElist);
 var od=document.getElementById("onlydoc"); if(od) od.addEventListener("change",renderElist);
 var ok=document.getElementById("onlyok"); if(ok) ok.addEventListener("change",renderElist);
