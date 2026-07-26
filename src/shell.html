@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#7A1F2B">
+<title>EM Course Planner — IITH Techno-Entrepreneurship</title>
+<style>
+/*__THEME__*/
+
+/* ============================================================
+   BRAND OVERRIDE — academic maroon instead of copper.
+   Maroon clears 10.2:1 on white, so unlike copper one value
+   serves both fills and text. Text sitting ON a maroon fill
+   must be light, hence --brand-deep flips to near-white.
+   ============================================================ */
+:root{
+  --brand:#7A1F2B;
+  --brand-text:#7A1F2B;
+  --brand-wash:#F3E7E9;
+  --brand-deep:#FBF7F6;
+  --brand-hover:#661924;
+  --ink3:#5E656D;
+  /* course-block hues — identity, not status */
+  --core:#1E3A5F;   --core-wash:#E6ECF3;   --core-line:#BCCBDE;
+  --elec:#5B4A7D;   --elec-wash:#EDE9F3;   --elec-line:#CFC5DF;
+  --engg:#0F766E;   --engg-wash:#E2F1EF;   --engg-line:#B4D9D4;
+  --mand:#6B5B44;   --mand-wash:#F2EEE6;   --mand-line:#D6CDBC;
+}
+
+/* ---------- hero: semester switch on the dark band ---------- */
+.seg.ondark{border-color:#3A3E45;background:transparent}
+.seg.ondark button{color:#A7ADB5}
+.seg.ondark button + button{border-left-color:#3A3E45}
+.seg.ondark button.on{background:#F6F5F1;color:var(--ink)}
+.herobar{display:flex;flex-wrap:wrap;gap:22px;align-items:flex-end;justify-content:space-between}
+
+/* ---------- two-column workspace ---------- */
+.cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.28fr);gap:24px;align-items:start}
+@media (max-width:940px){.cols{grid-template-columns:minmax(0,1fr)}}
+
+/* ---------- requirement groups ---------- */
+.grp{border-bottom:1px solid var(--line)}
+.grp:last-child{border-bottom:0}
+.ghead{display:flex;align-items:center;gap:11px;padding:13px 18px 11px;background:var(--hover)}
+.gname{font-size:14px;font-weight:620}
+.gtally{margin-left:auto;font-size:12px;font-weight:640;padding:3px 9px;border-radius:20px;white-space:nowrap}
+.gtally.done{background:var(--good-wash);color:var(--good)}
+.gtally.todo{background:var(--line);color:var(--ink3)}
+.gtally.over{background:var(--bad-wash);color:var(--bad)}
+.grule{padding:0 18px 11px;font-size:12.5px;color:var(--ink3);line-height:1.5}
+
+label.crs{display:flex;gap:11px;align-items:flex-start;padding:10px 18px;cursor:pointer;
+  border-top:1px solid #F0EEE9;transition:background .13s}
+label.crs:hover{background:var(--hover)}
+label.crs input{margin:3px 0 0;flex:none}
+label.crs.dis{opacity:.55;cursor:not-allowed}
+label.crs.dis input{cursor:not-allowed}
+.cmain{flex:1;min-width:0}
+.ccode{font-size:13px;font-weight:660;letter-spacing:.01em;font-family:var(--mono)}
+.ctitle{font-size:12.5px;color:var(--ink2);margin-top:1px}
+.cmeta{font-size:11.5px;color:var(--ink3);margin-top:3px}
+.cright{flex:none;text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.slotbadge{font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;letter-spacing:.04em;
+  background:var(--core-wash);color:var(--core);font-family:var(--mono)}
+.slotbadge.none{background:var(--line);color:var(--ink3)}
+.cr{font-size:11.5px;color:var(--ink3)}
+.flag{font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;padding:2px 6px;border-radius:3px}
+.flag.blocked,.flag.clash{background:var(--bad-wash);color:var(--bad)}
+.flag.off,.flag.next{background:var(--line);color:var(--ink3)}
+.flag.noslot{background:var(--warn-wash);color:var(--warn)}
+
+/* ---------- engineering elective picker ---------- */
+.epick{padding:14px 18px 16px}
+.searchrow{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:11px}
+#esearch{flex:1;min-width:170px;font-size:13.5px;padding:8px 11px}
+.filtoggle{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ink2);cursor:pointer;user-select:none}
+.elist{max-height:340px;overflow-y:auto;border:1px solid var(--line);border-radius:var(--radius-sm)}
+.erow{display:flex;gap:10px;align-items:center;padding:9px 12px;cursor:pointer;
+  border-bottom:1px solid #F2F0EB;font-size:13px}
+.erow:last-child{border-bottom:0}
+.erow:hover{background:var(--hover)}
+.erow.sel{background:var(--engg-wash);box-shadow:inset 3px 0 0 var(--engg)}
+.erow.clash{opacity:.5}
+.erow.clash:hover{background:var(--bad-wash);opacity:.78}
+.ecode{font-weight:660;flex:none;width:64px;font-family:var(--mono)}
+.etitle{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink2)}
+.edept{flex:none;font-size:11px;color:var(--ink3);width:96px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ecount{font-size:12px;color:var(--ink3);margin-top:9px}
+.vdot{width:6px;height:6px;border-radius:50%;background:var(--engg);flex:none}
+.vdot.un{background:var(--line2)}
+.customrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px;padding-top:13px;border-top:1px dashed var(--line2)}
+.customrow input,.customrow select{padding:7px 10px;font-size:13px;width:auto}
+#ccode{width:96px} #ccr{width:62px} #cname{flex:1;min-width:120px}
+
+/* ---------- credit total bar ---------- */
+.totalbar{display:flex;align-items:baseline;gap:12px;padding:15px 18px;
+  border-bottom:1px solid var(--line);flex-wrap:wrap}
+.totalbar .n{font-size:30px;font-weight:680;letter-spacing:-.025em;line-height:1;font-family:var(--mono)}
+.totalbar .n.ok{color:var(--good)} .totalbar .n.no{color:var(--bad)}
+.totalbar .of{font-size:14px;color:var(--ink3)}
+.totalbar .lab{font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3);margin-left:auto}
+
+/* ---------- status messages ---------- */
+.stat{padding:15px 18px;border-bottom:1px solid var(--line)}
+.stat:last-of-type{border-bottom:1px solid var(--line)}
+.stat.good{background:var(--good-wash)}
+.stat.bad{background:var(--bad-wash)}
+.stat.warn{background:var(--warn-wash)}
+.stat h3{font-size:13.5px;font-weight:660;margin-bottom:4px}
+.stat.good h3{color:var(--good)} .stat.bad h3{color:var(--bad)} .stat.warn h3{color:var(--warn)}
+.stat p{margin:0;font-size:12.5px;color:var(--ink2);line-height:1.5}
+.stat p + p{margin-top:5px}
+
+/* ---------- week grid ---------- */
+.gridscroll{overflow-x:auto}
+table.wk{border-collapse:collapse;width:100%;min-width:530px;table-layout:fixed}
+table.wk th,table.wk td{border:1px solid var(--line);padding:0}
+table.wk thead th{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);
+  font-weight:620;padding:9px 6px;background:var(--hover)}
+table.wk tbody th{font-size:11px;color:var(--ink3);font-weight:500;padding:7px 9px;text-align:right;
+  background:var(--hover);white-space:nowrap;width:72px;font-family:var(--mono)}
+td.c{height:56px;vertical-align:top;padding:4px;position:relative}
+td.c.free{background:repeating-linear-gradient(135deg,#fff,#fff 6px,#FAF9F5 6px,#FAF9F5 12px)}
+.sl{position:absolute;top:3px;right:5px;font-size:9.5px;color:#C3C0B8;font-weight:600;font-family:var(--mono)}
+.bk{border-radius:4px;padding:4px 5px;height:100%;display:flex;flex-direction:column;
+  justify-content:center;overflow:hidden}
+.bk .a{font-size:11px;font-weight:700;line-height:1.2;letter-spacing:-.01em;font-family:var(--mono)}
+.bk .b{font-size:9px;line-height:1.22;opacity:.8;margin-top:1px;overflow:hidden}
+.bk.core{background:var(--core-wash);border:1px solid var(--core-line);color:var(--core)}
+.bk.mgmt{background:var(--elec-wash);border:1px solid var(--elec-line);color:var(--elec)}
+.bk.eng {background:var(--engg-wash);border:1px solid var(--engg-line);color:var(--engg)}
+.bk.mand{background:var(--mand-wash);border:1px solid var(--mand-line);color:var(--mand)}
+.bk.bad{background:var(--bad-wash);border:1.5px solid var(--bad);color:var(--bad)}
+.legend{display:flex;flex-wrap:wrap;gap:16px;font-size:12px;color:var(--ink3);padding:13px 18px 0}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.actions{display:flex;gap:9px;flex-wrap:wrap;padding:15px 18px}
+
+/* ---------- reference tables ---------- */
+table.dl{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:4px}
+table.dl th{text-align:left;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);
+  font-weight:620;padding:0 10px 9px;border-bottom:1px solid var(--line)}
+table.dl td{padding:10px;border-bottom:1px solid #F0EEE9}
+table.dl tr:last-child td{border-bottom:0}
+table.dl tr.hot td{background:var(--bad-wash)}
+.faults{display:grid;grid-template-columns:repeat(auto-fit,minmax(268px,1fr));gap:14px;margin-top:6px}
+.fault{border:1px solid var(--line);border-radius:8px;padding:15px 16px;background:var(--hover)}
+.fault .n{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--brand);font-weight:700;margin-bottom:6px}
+.fault h4{margin:0 0 6px;font-size:13.5px;font-weight:640}
+.fault p{margin:0;font-size:12.8px;color:var(--ink2);line-height:1.55}
+.fault .fix{margin-top:9px;padding-top:9px;border-top:1px solid var(--line);font-size:12.5px;color:var(--good)}
+.fault .fix b{color:var(--good);font-weight:660}
+.prose ol.steps > li{padding-bottom:16px}
+
+
+/* ================= NEW IN V3 ================= */
+[hidden]{display:none!important}
+
+/* ---------- readiness strip in the hero ---------- */
+.readywrap{margin-top:22px;background:#1F2229;border:1px solid #34383F;border-radius:10px;padding:15px 18px}
+.readyhead{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.readyhead .rt{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--brand);font-weight:640}
+.readyhead .rn{margin-left:auto;font-size:13px;color:#A7ADB5}
+.readyhead .rn b{color:#F6F5F1}
+.bar{height:5px;border-radius:3px;background:#34383F;margin:11px 0 13px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--brand);transition:width .3s;border-radius:3px}
+.rsteps{display:flex;gap:7px;flex-wrap:wrap}
+.rstep{font-size:11.5px;padding:4px 10px;border-radius:20px;background:#2A2E36;color:#8B9199;
+  display:flex;align-items:center;gap:6px;white-space:nowrap}
+.rstep.done{background:rgba(15,118,110,.22);color:#5FCBBB}
+.rstep.blocked{background:rgba(179,35,76,.2);color:#F09CB4}
+.rstep .tick{font-weight:800;font-size:11px}
+
+/* ---------- start-here explainer ---------- */
+.startcard{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);margin-bottom:22px;overflow:hidden}
+.starthead{display:flex;align-items:center;gap:12px;padding:15px 18px;cursor:pointer;background:var(--brand-wash)}
+.starthead h2{font-size:13.5px;font-weight:660;color:var(--brand-text)}
+.starthead .hint{margin-left:auto;font-size:12px;color:var(--brand-text);opacity:.8}
+.startbody{padding:4px 18px 18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(232px,1fr));gap:16px}
+.sb{padding-top:14px}
+.sb h4{font-size:13.5px;font-weight:640;margin-bottom:5px}
+.sb p{margin:0;font-size:13px;color:var(--ink2);line-height:1.55}
+
+/* ---------- glossary term + popover ---------- */
+.gterm{border-bottom:1px dashed var(--line2);cursor:help;background:none;border-top:0;border-left:0;border-right:0;
+  font:inherit;color:inherit;padding:0;text-align:left}
+.gterm:hover{border-bottom-color:var(--brand);color:var(--brand-text)}
+#pop{position:absolute;z-index:60;max-width:320px;background:var(--ink);color:#F6F5F1;border-radius:8px;
+  padding:12px 14px;font-size:12.5px;line-height:1.55;box-shadow:0 8px 26px rgba(0,0,0,.24);display:none}
+#pop.on{display:block}
+#pop .pt{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--brand);font-weight:700;margin-bottom:5px}
+
+/* ---------- course detail drawer ---------- */
+#dbg{position:fixed;inset:0;background:rgba(20,20,18,.42);z-index:80;display:none}
+#dbg.on{display:block}
+#drawer{position:fixed;top:0;right:0;bottom:0;width:400px;max-width:92vw;background:var(--card);z-index:90;
+  transform:translateX(100%);transition:transform .22s;overflow-y:auto;box-shadow:-8px 0 30px rgba(0,0,0,.16)}
+#drawer.on{transform:translateX(0)}
+.dhead{position:sticky;top:0;background:var(--ink);color:#F6F5F1;padding:16px 18px;display:flex;align-items:flex-start;gap:12px}
+.dhead .dc{font-family:var(--mono);font-size:18px;font-weight:700;letter-spacing:-.01em}
+.dhead .dt{font-size:12.5px;color:#A7ADB5;margin-top:3px}
+.dclose{margin-left:auto;background:transparent;border:1px solid #3A3E45;color:#C9CED4;border-radius:6px;
+  font:inherit;font-size:16px;line-height:1;padding:5px 10px;cursor:pointer;flex:none}
+.dclose:hover{border-color:#6B7178}
+.dsec{padding:15px 18px;border-bottom:1px solid var(--line)}
+.dsec h5{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);font-weight:640;margin:0 0 9px}
+.dkv{display:flex;gap:12px;font-size:13px;padding:4px 0}
+.dkv .k{flex:none;width:104px;color:var(--ink3)}
+.dkv .v{flex:1;min-width:0}
+.dmeet{font-family:var(--mono);font-size:12.5px;background:var(--hover);border:1px solid var(--line);
+  border-radius:6px;padding:8px 11px;margin-top:4px}
+.dmeet div + div{margin-top:3px}
+.codemap{display:flex;gap:3px;font-family:var(--mono);font-size:22px;font-weight:700;margin-bottom:12px}
+.codemap span{padding:3px 5px;border-radius:4px}
+.cm0{background:#E6ECF3;color:#1E3A5F} .cm1{background:var(--brand-wash);color:var(--brand-text)}
+.cm2{background:var(--engg-wash);color:var(--engg)} .cm3{background:var(--line);color:var(--ink3)}
+.codelist{font-size:12.5px;color:var(--ink2);line-height:1.5}
+.codelist b{display:inline-block;min-width:76px;color:var(--ink)}
+
+/* ---------- pre-flight / AIMS script ---------- */
+.scriptrow{display:flex;gap:12px;align-items:center;padding:11px 18px;border-bottom:1px solid #F1EFEA;font-size:13px}
+.scriptrow:last-child{border-bottom:0}
+.srn{flex:none;width:56px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink4);font-weight:640}
+.srtype{flex:1;min-width:0}
+.srtype .l{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink4);font-weight:640}
+.srtype .v{font-size:13.5px;font-weight:620;margin-top:1px}
+.srcode{flex:none;font-family:var(--mono);font-size:15px;font-weight:700;background:var(--brand-wash);
+  color:var(--brand-text);padding:5px 11px;border-radius:6px}
+.checklist{list-style:none;margin:0;padding:0}
+.checklist li{display:flex;gap:11px;align-items:flex-start;padding:11px 18px;border-bottom:1px solid #F1EFEA}
+.checklist li:last-child{border-bottom:0}
+.checklist input{margin:2px 0 0;flex:none}
+.checklist .ct{font-size:13.5px;font-weight:600}
+.checklist .cd{font-size:12.5px;color:var(--ink3);margin-top:2px;line-height:1.5}
+.blockmsg{padding:26px 18px;text-align:center;color:var(--ink3);font-size:13.5px}
+.blockmsg b{display:block;color:var(--ink);font-size:15px;margin-bottom:5px}
+
+/* ---------- elective picker: dept filter + info button ---------- */
+.einfo{flex:none;width:22px;height:22px;border-radius:50%;border:1px solid var(--line2);background:#fff;
+  color:var(--ink3);font:inherit;font-size:11px;font-weight:700;cursor:pointer;line-height:1;padding:0}
+.einfo:hover{border-color:var(--brand);color:var(--brand-text)}
+.einfo.hasdoc{background:var(--brand-wash);border-color:#DCC3C7;color:var(--brand-text)}
+.einfo.hasdoc:hover{background:var(--brand);border-color:var(--brand);color:#fff}
+#edept{max-width:190px;font-size:13px;padding:8px 10px}
+.erow.untitled .etitle{color:var(--warn);font-style:italic}
+
+/* ---------- code decoder block ---------- */
+.decoder{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-top:16px}
+.dcard{border:1px solid var(--line);border-radius:8px;padding:14px 16px;background:var(--hover)}
+.dcard .dl{font-family:var(--mono);font-size:15px;font-weight:700;margin-bottom:6px}
+.dcard p{margin:0;font-size:12.8px;color:var(--ink2);line-height:1.5}
+
+@media print{ .readywrap,.startcard,#drawer,#dbg,#pop{display:none!important} }
+
+
+/* ============================================================
+   LIGHT — no black anywhere. Paper, white cards, one maroon
+   accent. Every dark surface from the theme is overridden here.
+   ============================================================ */
+:root{ --paper:#FBFAF7; --hover:#FAF8F5; --line:#E7E4DD; --line2:#D3CFC6; }
+
+/* header */
+header{background:#fff;color:var(--ink);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:40}
+.logo{color:var(--ink)}
+.logomark{color:#fff}
+nav.main a{color:var(--ink3)}
+nav.main a:hover{color:var(--brand)}
+
+/* hero */
+.hero{background:linear-gradient(180deg,#FBF5F5 0%,var(--paper) 100%);color:var(--ink);
+  border-bottom:1px solid var(--line);padding:26px 0 30px}
+.hero h1{font-size:32px;max-width:24ch}
+.hero .eyebrow{color:var(--brand)}
+.hero .sub{color:var(--ink2);max-width:60ch}
+.hero .sub b{color:var(--ink)}
+.seg.ondark{border-color:var(--line2);background:#fff}
+.seg.ondark button{color:var(--ink3)}
+.seg.ondark button + button{border-left-color:var(--line)}
+.seg.ondark button.on{background:var(--brand-wash);color:var(--brand-text);font-weight:660}
+
+/* readiness */
+.readywrap{background:#fff;border:1px solid var(--line);border-radius:10px;margin-top:20px}
+.readyhead .rt{color:var(--ink3)}
+.readyhead .rn{color:var(--ink3)}
+.readyhead .rn b{color:var(--ink)}
+.bar{background:var(--line)}
+.rstep{background:var(--paper);color:var(--ink3);border:1px solid var(--line)}
+.rstep.done{background:var(--good-wash);color:var(--good);border-color:#BFE3DD}
+.rstep.blocked{background:var(--bad-wash);color:var(--bad);border-color:#F2C6D2}
+
+/* glossary popover */
+#pop{background:#fff;color:var(--ink2);border:1px solid var(--line2);
+  box-shadow:0 10px 28px rgba(26,26,24,.14)}
+#pop .pt{color:var(--brand)}
+
+/* drawer */
+#dbg{background:rgba(26,26,24,.26)}
+.dhead{background:var(--paper);color:var(--ink);border-bottom:1px solid var(--line)}
+.dhead .dt{color:var(--ink3)}
+.dclose{border-color:var(--line2);color:var(--ink3)}
+.dclose:hover{border-color:var(--brand);color:var(--brand)}
+
+/* numbered steps: maroon discs, not black */
+.steps li::before{background:var(--brand);color:#fff}
+
+/* footer */
+footer{background:#fff;color:var(--ink2);border-top:1px solid var(--line)}
+footer h5{color:var(--ink4)}
+footer a{color:var(--ink2)}
+footer a:hover{color:var(--brand)}
+footer .blurb{color:var(--ink3)}
+.fbot{border-top-color:var(--line);color:var(--ink4)}
+
+/* buttons: keep one solid maroon, everything else outlined */
+.btn.dark{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn.dark:hover{background:var(--brand-hover);border-color:var(--brand-hover)}
+
+/* ---------- ready confirmation ---------- */
+.readycard{border:1px solid #BFE3DD;background:var(--good-wash);border-radius:var(--radius);
+  padding:22px 24px;margin-bottom:22px;display:none}
+.readycard.on{display:block}
+.readycard h2{font-size:19px;font-weight:670;color:var(--good);margin-bottom:6px}
+.readycard p{margin:0 0 14px;font-size:14px;color:#155E56;line-height:1.6;max-width:70ch}
+.readysum{background:#fff;border:1px solid #CDE7E2;border-radius:8px;overflow:hidden}
+.rsrow{display:flex;gap:12px;align-items:center;padding:9px 14px;border-bottom:1px solid #EDF6F4;font-size:13px}
+.rsrow:last-child{border-bottom:0}
+.rsrow .c{font-family:var(--mono);font-weight:700;width:66px;flex:none}
+.rsrow .t{flex:1;min-width:0;color:var(--ink2)}
+.rsrow .s{flex:none;font-family:var(--mono);font-size:12px;color:var(--ink3)}
+
+/* ---------- fractal explainer ---------- */
+.segbar{display:flex;gap:3px;margin:16px 0 8px}
+.segcell{flex:1;background:var(--paper);border:1px solid var(--line);border-radius:5px;
+  padding:9px 6px;text-align:center;font-size:11px;color:var(--ink3)}
+.segcell b{display:block;font-size:13px;color:var(--ink);font-weight:660;margin-bottom:2px}
+.spanrow{display:flex;gap:3px;margin-bottom:7px;align-items:center}
+.spanlab{flex:none;width:112px;font-size:12.5px;color:var(--ink2)}
+.spancell{flex:1;height:22px;border-radius:4px;background:var(--paper);border:1px solid var(--line)}
+.spancell.on{background:var(--brand-wash);border-color:#DCC3C7}
+.spanval{flex:none;width:74px;font-size:12px;color:var(--ink3);text-align:right;font-family:var(--mono)}
+
+/* ---------- workload block in the drawer ---------- */
+.loadbox{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:11px 13px;margin-top:4px}
+.loadbox .lrow{display:flex;gap:10px;font-size:12.5px;padding:2px 0}
+.loadbox .lrow .lk{flex:none;width:96px;color:var(--ink3)}
+.loadbox .lrow .lv{flex:1;color:var(--ink)}
+
+@media print{ header{position:static} }
+
+/* ---------- print: the carryable timetable ---------- */
+#printlist{display:none;margin-top:14px;font-size:11px}
+#printlist table{width:100%;border-collapse:collapse}
+#printlist td{padding:4px 8px;border-bottom:1px solid #ddd}
+@media print{
+  body{background:#fff;font-size:11px}
+  header,footer{background:#fff;color:#000}
+  header{border-bottom:2px solid #000;padding:0 0 8px}
+  .hero{background:#fff;color:#000;padding:0 0 10px;border-bottom:2px solid #000}
+  .hero h1{font-size:17px;color:#000}
+  .hero .sub,.eyebrow,nav.main,.semtoggle,.noprint,.prose,.card > .ch,.actions,.epick,.legend,
+  #pickcard,footer{display:none!important}
+  .cols{grid-template-columns:1fr;gap:0}
+  .card{border:0;margin:0 0 12px;break-inside:avoid}
+  #wkcard{break-inside:avoid}
+  .totalbar{border:0;padding:10px 0 6px}
+  .totalbar .n{font-size:22px}
+  .stat{border:1px solid #ccc;border-radius:4px;margin:0 0 8px;padding:8px 10px}
+  #printlist{display:block!important}
+  a[href]:after{content:""}
+}
+
+@media (max-width:640px){
+  .navbar{flex-wrap:wrap;gap:12px}
+  .logo{flex:none;white-space:nowrap}
+  nav.main{flex-basis:100%;margin-left:0;gap:14px;row-gap:8px}
+  .hero h1{font-size:26px}
+}
+@media (max-width:520px){
+  .cright{flex-direction:row;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+  label.crs{flex-wrap:wrap}
+  .cmain{flex-basis:100%}
+}
+</style>
+</head>
+<body>
+
+<header class="noprint">
+  <div class="wrap navbar">
+    <a class="logo" href="#"><span class="logomark">EM</span> Course Planner</a>
+    <nav class="main">
+      <a href="#how">Register in AIMS</a>
+      <a href="#faults">Where AIMS trips you up</a>
+      <a href="#calendar">Calendar</a>
+      <a href="#difficulty">Is it easy?</a>
+      <a href="#fractal">Fractal system</a>
+      <a href="#slots">Slot grid</a>
+      <a href="#mistakes">8 ways to get it wrong</a>
+      <a href="#glossary">Glossary</a>
+      <a href="#seniors">Seniors' picks</a>
+      <a href="#dates">Dates</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap herobar">
+    <div>
+      <div class="eyebrow">IIT Hyderabad · Entrepreneurship &amp; Management</div>
+      <h1>M.Tech Techno-Entrepreneurship, planned in one page.</h1>
+      <p class="sub">Tick your courses, watch the week fill, catch clashes before AIMS does.
+        Built for <b>July–November 2026</b> from the official IITH timetables, the department
+        orientation deck and live AIMS data.</p>
+    </div>
+    <div class="seg ondark noprint" id="semtoggle" role="group" aria-label="Semester">
+      <button data-s="1" class="on" type="button">Semester 1</button>
+      <button data-s="2" type="button">Semester 2</button>
+    </div>
+  </div>
+  <div class="wrap noprint">
+    <div class="readywrap">
+      <div class="readyhead">
+        <span class="rt">Are you ready to register</span>
+        <span class="rn" id="rcount"></span>
+      </div>
+      <div class="bar"><i id="rbar" style="width:0%"></i></div>
+      <div class="rsteps" id="rsteps"></div>
+    </div>
+  </div>
+</section>
+
+<main class="wrap" style="padding:30px 0 90px">
+<!-- ===== START HERE ===== -->
+<div class="startcard noprint" id="startcard">
+  <div class="starthead" id="starthead" role="button" tabindex="0" aria-expanded="true" aria-controls="startbody">
+    <h2>New to this? Read these four things first</h2>
+    <span class="hint" id="starthint">Hide</span>
+  </div>
+  <div class="startbody" id="startbody">
+    <div class="sb">
+      <h4>What you are actually choosing</h4>
+      <p>Three <button class="gterm" data-g="core">core</button> courses are compulsory and chosen for you.
+         You pick two 1-credit department electives, and one 3-credit
+         <button class="gterm" data-g="engineering elective">engineering elective</button> from another
+         department. That is 14 <button class="gterm" data-g="credit">credits</button>.</p>
+    </div>
+    <div class="sb">
+      <h4>Why slots decide everything</h4>
+      <p>Every course sits in one <button class="gterm" data-g="slot">slot</button>, a letter that fixes when
+         it meets. Two courses in the same letter clash, and no instructor will move one for you. Your core
+         courses fill slots first; the elective has to fit in what is left.</p>
+    </div>
+    <div class="sb">
+      <h4>The deadline that actually bites</h4>
+      <p>Your department email says 3 August. Every course record in AIMS says registration closes
+         <b>31 July at 23:59</b>. Work to the earlier one — if the portal locks you out on 1 August, the email
+         will not help.</p>
+    </div>
+    <div class="sb">
+      <h4>Pressing Register is not the end</h4>
+      <p>Your <button class="gterm" data-g="fa">Faculty Advisor</button> still has to approve it, and a rejection
+         appears in a collapsed list at the bottom of the AIMS page. Go back and check a day later.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== READY CONFIRMATION ===== -->
+<div class="readycard" id="readycard">
+  <h2>You are ready to register</h2>
+  <p id="readytext"></p>
+  <div class="readysum" id="readysum"></div>
+</div>
+
+<div class="cols">
+
+  <div>
+    <div class="card" id="pickcard">
+      <div class="ch"><h2>1 · Choose your courses</h2></div>
+      <div id="groups"></div>
+    </div>
+
+    <div class="card noprint">
+      <div class="ch"><h2>2 · Engineering elective</h2></div>
+      <div class="epick">
+        <div class="searchrow">
+          <input type="text" id="esearch" placeholder="Search 135 courses by code, title or department…">
+          <label class="filtoggle"><input type="checkbox" id="onlyfree" checked> Hide clashes</label>
+        </div>
+        <div class="searchrow">
+          <select id="edept" aria-label="Filter by department"><option value="">All departments</option></select>
+          <label class="filtoggle"><input type="checkbox" id="onlyok" checked> Only ones I can pick</label>
+          <label class="filtoggle"><input type="checkbox" id="onlydoc"> Only ones with a published syllabus</label>
+        </div>
+        <div class="elist" id="elist"></div>
+        <div class="ecount" id="ecount"></div>
+        <div class="customrow">
+          <input type="text" id="ccode" placeholder="Code" maxlength="8">
+          <select id="cslot"><option value="">Slot</option></select>
+          <input type="text" id="ccr" placeholder="Cr" maxlength="4">
+          <input type="text" id="cname" placeholder="Course not in the list? Add it here">
+          <button class="btn ghost sm" id="cadd" type="button">Add</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="card" id="wkcard">
+      <div class="ch"><h2>3 · Your week</h2></div>
+      <div class="totalbar">
+        <span class="n" id="totn">0</span><span class="of">of <span id="totneed">14</span> credits</span>
+        <span class="lab" id="semlab">Semester 1</span>
+      </div>
+      <div id="status"></div>
+      <div class="gridscroll"><table class="wk">
+        <thead><tr><th></th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th></tr></thead>
+        <tbody id="wkbody"></tbody>
+      </table></div>
+      <div class="legend noprint">
+        <span><i style="background:var(--core-wash);border:1px solid var(--core-line)"></i>Core</span>
+        <span><i style="background:var(--elec-wash);border:1px solid var(--elec-line)"></i>Department elective</span>
+        <span><i style="background:var(--engg-wash);border:1px solid var(--engg-line)"></i>Engineering elective</span>
+        <span><i style="background:var(--mand-wash);border:1px solid var(--mand-line)"></i>Mandatory</span>
+        <span><i style="background:var(--bad-wash);border:1.5px solid var(--bad)"></i>Clash</span>
+      </div>
+      <div id="printlist"></div>
+      <div class="actions noprint">
+        <button class="btn ghost" id="btnprint" type="button">Print / save as PDF</button>
+        <button class="btn" id="btncal" type="button">Add to Google Calendar</button>
+        <button class="btn ghost" id="btncopy" type="button">Copy as text</button>
+        <button class="btn ghost" id="btnlink" type="button">Copy shareable link</button>
+        <button class="btn ghost" id="btnclear" type="button">Clear</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PRE-FLIGHT ===== -->
+<div class="card noprint" id="preflight">
+  <div class="ch"><h2>4 · Before you open AIMS</h2>
+    <span class="chnote">Type these rows in this order</span></div>
+  <div style="padding:14px 18px;border-bottom:1px solid var(--line);background:var(--hover)">
+    <label class="filtoggle" style="font-size:13.5px;color:var(--ink)">
+      <input type="checkbox" id="faack">
+      I have spoken to my Faculty Advisor about the engineering elective
+    </label>
+    <p style="margin:6px 0 0 26px;font-size:12.5px;color:var(--ink3);line-height:1.5">
+      The department requires this before you choose one, and only you know whether it happened.
+      Nothing here can check it for you.</p>
+  </div>
+  <div id="scriptbody"></div>
+  <div class="actions" id="scriptactions" hidden>
+    <button class="btn" id="btnscript" type="button">Copy the script</button>
+    <a class="btn ghost" href="https://aims.iith.ac.in/" target="_blank" rel="noopener">Open AIMS</a>
+  </div>
+  <div class="ch" style="border-top:1px solid var(--line)"><h2>Then work down this list</h2></div>
+  <ul class="checklist" id="checklist"></ul>
+</div>
+
+<!-- ===== MISTAKES ===== -->
+<div class="prose noprint" id="mistakes">
+  <h2>Eight ways students get this wrong</h2>
+  <p class="lede">Each one is something AIMS lets you do, or fails to tell you. Each has a matching guard here.</p>
+  <div class="faults" id="mistlist"></div>
+</div>
+
+<!-- ===== CODE DECODER ===== -->
+<div class="prose noprint" id="decode">
+  <h2>Reading a course code</h2>
+  <p class="lede">Two letters and four numbers. Once you can read one, you can tell at a glance whether a course
+     is even allowed to be your engineering elective.</p>
+  <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap">
+    <div class="codemap" aria-hidden="true">
+      <span class="cm0">EM</span><span class="cm1">5</span><span class="cm2">0</span><span class="cm3">90</span>
+    </div>
+    <div class="codelist" id="codelist"></div>
+  </div>
+  <div class="gotcha" style="margin-top:18px">
+    <div class="g">The one that matters</div>
+    <p>Your engineering elective's first digit must be <b>5 or 6</b>. A Level 4 course looks similar and will not
+      count. This planner only lists eligible courses, but check the digit yourself if you add one by hand.</p>
+  </div>
+</div>
+
+<!-- ===== GLOSSARY ===== -->
+<div class="prose noprint" id="glossary">
+  <h2>Every word that trips people up</h2>
+  <p class="lede">Dotted underlines anywhere on this page open the same definitions.</p>
+  <div class="decoder" id="glosslist"></div>
+</div>
+
+<!-- HOW TO REGISTER -->
+<div class="prose noprint" id="how">
+  <h2>How to actually register in AIMS</h2>
+  <p class="lede">Walked through on a live account, 25 July 2026. The gotchas are the parts nobody tells you.</p>
+  <ol class="steps" style="grid-template-columns:1fr">
+    <li>
+      <div class="st">Log in at aims.iith.ac.in</div>
+      <div class="sd">Roll number and password, plus a CAPTCHA. Then <code>Menu → Academic → Course Registration</code>.</div>
+    </li>
+    <li>
+      <div class="st">Pick the right term</div>
+      <div class="sd">Three terms show as "Open" at once — JUL26-NOV26, May-July (Summer) 2026, and JUL25-NOV25.
+        You want <b>JUL26-NOV26</b>. Click <b>Go For Registration</b> on that row.</div>
+      <div class="gotcha"><div class="g">Gotcha</div><p>Old terms staying "Open" is the easiest way to register into the wrong semester. Check the term label before you click.</p></div>
+    </li>
+    <li>
+      <div class="st">Add one row per course</div>
+      <div class="sd">Click the <b>+</b> beside <b>Regular</b>. Each click adds one row — Semester 1 means six rows:
+        three core, two department electives, one engineering elective.</div>
+    </li>
+    <li>
+      <div class="st">Set the Elective Type first, then the course</div>
+      <div class="sd">The course search will not open until an Elective Type is chosen — it just says "Please select
+        elective." Core EM courses go under <b>Departmental Core Theory</b>, your 1-credit electives under
+        <b>Departmental Elective</b>, and the engineering elective normally under <b>Free Elective</b>.</div>
+      <div class="gotcha"><div class="g">Gotcha</div><p>The dropdown offers 14 types with no explanation of which applies to you, and the wrong one can get your whole submission rejected. Ask your FA before submitting, not after.</p></div>
+    </li>
+    <li>
+      <div class="st">Search by course code, not by browsing</div>
+      <div class="sd">Click the blue magnifier. The list opens at <b>10 per page across 60 pages</b>. Change
+        <b>Search By</b> to <b>Course Code</b>, type the code, hit Search.</div>
+    </li>
+    <li>
+      <div class="st">Check every course actually appears</div>
+      <div class="sd">Only 596 of the 786 courses running this term appear in the picker. If a course returns
+        "No records found" it is not registerable for you, even when it is timetabled and its registration window
+        is open. <b>That is the department's to fix, and it will not fix itself.</b> Email them the same day.</div>
+    </li>
+    <li>
+      <div class="st">Add a comment, then Register</div>
+      <div class="sd">Comments cap at 150 characters. After submitting, your Registration Status changes from
+        "–" and your FA has to approve it. Check back — a rejected submission appears under
+        <b>Recent Submission Rejected List</b> at the bottom, which is easy to miss.</div>
+    </li>
+  </ol>
+  <h3 style="font-size:14.5px;font-weight:640;margin:22px 0 6px">Two dates that disagree</h3>
+  <p>Every course record in AIMS says student registration ends <b>31 July 2026, 23:59</b>. The academic calendar
+     and the department's email say the last date to add is <b>3 August 2026</b>. Work to the earlier one.</p>
+</div>
+
+<!-- ANALYSIS -->
+<div class="prose noprint" id="faults">
+  <h2>Where AIMS trips students up</h2>
+  <p class="lede">Seven friction points, each hit firsthand while registering one student. None are the student's fault.</p>
+  <div class="faults">
+    <div class="fault"><div class="n">Fault 01</div><h4>It does not know your curriculum</h4>
+      <p>AIMS shows every student the same 596-course list. Nothing says EM5090 is compulsory for you, or that your
+         engineering elective must be Level 5 or 6. Those rules live in an email.</p>
+      <div class="fix"><b>Here:</b> requirements are built in and counted as you tick.</div></div>
+    <div class="fault"><div class="n">Fault 02</div><h4>No clash detection at all</h4>
+      <p>The picker never shows a slot. You can register two courses in the same slot and find out in week one.
+         The slot data exists, three clicks deep, one course at a time.</p>
+      <div class="fix"><b>Here:</b> clashes are impossible to miss, and clashing options hide by default.</div></div>
+    <div class="fault"><div class="n">Fault 03</div><h4>Courses vanish with no reason given</h4>
+      <p>190 of the 786 running courses are missing from the picker. No message, no greyed-out row — just
+         "No records found," which reads like you typed the code wrong.</p>
+      <div class="fix"><b>Here:</b> known-blocked courses are labelled, with what to do about it.</div></div>
+    <div class="fault"><div class="n">Fault 04</div><h4>Fourteen elective types, no guidance</h4>
+      <p>Departmental Core Theory, Free Elective, FCC, Basic Engineering Skills and ten more. Nothing maps them to
+         your programme, and the same course list appears under every one.</p>
+      <div class="fix"><b>Here:</b> the type to pick is written next to each course group.</div></div>
+    <div class="fault"><div class="n">Fault 05</div><h4>Ten results per page, sixty pages</h4>
+      <p>596 courses paginated ten at a time, alphabetically by title, so "Advanced Cell Biology" comes before
+         anything you need. The page-size control is below the fold.</p>
+      <div class="fix"><b>Here:</b> one search box over the whole catalogue.</div></div>
+    <div class="fault"><div class="n">Fault 06</div><h4>Timetables live somewhere else entirely</h4>
+      <p>Slots are published as 25 separate Google Sheets and PDFs on the academics site, in different formats.
+         Three are not publicly readable at all.</p>
+      <div class="fix"><b>Here:</b> 135 engineering courses with slots, in one list.</div></div>
+    <div class="fault"><div class="n">Fault 07</div><h4>Nothing you can carry</h4>
+      <p>Once registered there is no timetable view, no calendar export, no printable week. Students rebuild it by
+         hand in a notes app, which is where copying errors creep in.</p>
+      <div class="fix"><b>Here:</b> print it, copy it as text, or bookmark the link.</div></div>
+  </div>
+</div>
+
+<!-- ===== CALENDAR ===== -->
+<div class="prose noprint" id="calendar">
+  <h2>Putting your timetable in your phone</h2>
+  <p class="lede">The button in section 3 downloads a calendar file with every class you picked, repeating weekly
+     for the whole semester, plus the deadlines. It works with Google, Apple and Outlook, and asks for no account
+     access at all.</p>
+  <ol class="steps" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr))">
+    <li>
+      <div class="st">Press “Add to Google Calendar”</div>
+      <div class="sd">A file called <code>iith-semester-1.ics</code> lands in your downloads. It contains one
+        repeating event per class meeting, with a reminder 15 minutes before each.</div>
+    </li>
+    <li>
+      <div class="st">Open Google Calendar on a computer</div>
+      <div class="sd">Settings, then <b>Import &amp; export</b>, then <b>Import</b>. Choose the file, pick which
+        calendar to add it to, and press Import. Doing this on a laptop is easier than on a phone.</div>
+    </li>
+    <li>
+      <div class="st">It syncs to your phone by itself</div>
+      <div class="sd">Anything in your Google account appears on your phone within a minute. Nothing else to install.</div>
+    </li>
+  </ol>
+  <div class="gotcha" style="margin-top:16px">
+    <div class="g">Worth knowing</div>
+    <p>Import it into a <b>new, separate calendar</b> named something like “IITH Sem 1”. If your timetable changes
+      you can delete that whole calendar and re-import, instead of hunting for individual events.</p>
+  </div>
+  <p style="margin-top:14px"><b>Just one course?</b> Open it with the ⓘ button and use the Google Calendar link in
+     the drawer. That adds a single weekly meeting — the download is the one that covers everything.</p>
+</div>
+
+<!-- ===== WHY NO DIFFICULTY RATING ===== -->
+<div class="prose noprint" id="difficulty">
+  <h2>Why there is no “easy / hard” rating here</h2>
+  <p class="lede">The most-asked question about electives is which ones are easy. The honest answer is that
+     nobody can tell you from published data, and a made-up rating is worse than none.</p>
+
+  <h3 style="font-size:14.5px;font-weight:640;margin:20px 0 4px">What IITH does not publish</h3>
+  <p><b>No grade distributions.</b> Not on the RTI page, not in the annual report, not on any department site.
+     Grades sit behind the AIMS login. And grading here is <b>relative and set by each instructor</b> — the
+     welcome booklet says outright that it is "based on the Instructor's perception of what an average
+     performance is" — so even a distribution would not transfer between years or teachers.</p>
+  <p><b>No public course feedback.</b> Feedback is collected, and submitting it is compulsory before you can see
+     your grades, but the results are held internally and anonymously. No per-course score is published anywhere.</p>
+  <p><b>No workload guidance beyond contact hours.</b> The only official statement is that one credit is roughly
+     14 to 15 hours of class, usually spread over five weeks. Nothing is published about expected study hours
+     outside class.</p>
+
+  <h3 style="font-size:14.5px;font-weight:640;margin:22px 0 4px">What you can actually go on</h3>
+  <p>Four things, all verifiable, all in this tool. <b>The syllabus</b>, where a department publishes one — open
+     any course with the ⓘ button. <b>The credit weight and length</b>, which fixes the teaching hours exactly.
+     <b>The code's second digit</b>, which tells you whether it is theory, a lab, or design work. And
+     <b>what your seniors took</b>, from the department's own orientation deck.</p>
+  <p>Beyond that, ask. A senior who sat the course last year, or the instructor, knows more than any dataset
+     that exists. That is not a limitation of this tool — it is the actual state of the information.</p>
+</div>
+
+<!-- ===== FRACTAL SYSTEM, EXPLAINED ===== -->
+<div class="prose noprint" id="fractal">
+  <h2>The fractal system, in plain English</h2>
+  <p class="lede">This is the part everyone finds confusing. It is actually one idea: IITH chops the semester into
+     six pieces, and a course can occupy any run of them.</p>
+
+  <h3 style="font-size:14.5px;font-weight:640;margin:20px 0 4px">Your semester is six blocks, not one</h3>
+  <p>Each block is about two and a half to three weeks. They are called <b>segments</b>. A course does not have to
+     run the whole term — it just has to start at one segment and end at another.</p>
+  <div class="segbar">
+    <div class="segcell"><b>1</b>27 Jul</div>
+    <div class="segcell"><b>2</b>—</div>
+    <div class="segcell"><b>3</b>31 Aug</div>
+    <div class="segcell"><b>4</b>—</div>
+    <div class="segcell"><b>5</b>6 Oct</div>
+    <div class="segcell"><b>6</b>ends 13 Nov</div>
+  </div>
+
+  <h3 style="font-size:14.5px;font-weight:640;margin:22px 0 4px">Length is the credit</h3>
+  <p>One segment is half a credit. So the number of segments a course spans <i>is</i> its size — there is nothing
+     else to learn. This is what a course code like &ldquo;segment 1–6&rdquo; or &ldquo;segment 3–4&rdquo; is telling you.</p>
+  <div style="margin-top:14px">
+    <div class="spanrow"><span class="spanlab">Segment 1–2</span>
+      <span class="spancell on"></span><span class="spancell on"></span><span class="spancell"></span>
+      <span class="spancell"></span><span class="spancell"></span><span class="spancell"></span>
+      <span class="spanval">1 credit</span></div>
+    <div class="spanrow"><span class="spanlab">Segment 1–4</span>
+      <span class="spancell on"></span><span class="spancell on"></span><span class="spancell on"></span>
+      <span class="spancell on"></span><span class="spancell"></span><span class="spancell"></span>
+      <span class="spanval">2 credits</span></div>
+    <div class="spanrow"><span class="spanlab">Segment 1–6</span>
+      <span class="spancell on"></span><span class="spancell on"></span><span class="spancell on"></span>
+      <span class="spancell on"></span><span class="spancell on"></span><span class="spancell on"></span>
+      <span class="spanval">3 credits</span></div>
+    <div class="spanrow"><span class="spanlab">Segment 3–4</span>
+      <span class="spancell"></span><span class="spancell"></span><span class="spancell on"></span>
+      <span class="spancell on"></span><span class="spancell"></span><span class="spancell"></span>
+      <span class="spanval">1 credit</span></div>
+  </div>
+
+  <h3 style="font-size:14.5px;font-weight:640;margin:22px 0 4px">Why this affects you three times</h3>
+  <p><b>Your electives are 1 credit each.</b> That is why you pick two small courses rather than one big one —
+     each runs for two segments, roughly five weeks, not the whole term.</p>
+  <p><b>Your drop deadline depends on it.</b> A 1-credit course must be dropped within a week of its segment
+     starting. A 3-credit course gets two weeks. Miss it and you are in the course, fine or no fine.</p>
+  <p><b>A short course can become a long one later.</b> A 1-credit overview of a subject can be followed by a
+     deeper 2 or 3-credit version in a later semester. That is the whole point of the name: the same subject at
+     different scales.</p>
+
+  <div class="gotcha" style="margin-top:18px">
+    <div class="g">What it does not mean</div>
+    <p>It has nothing to do with difficulty, and nothing to do with which courses you are allowed to take. It is
+      only about length. A 1-credit course is shorter, not easier.</p>
+  </div>
+</div>
+
+<!-- SLOT GRID -->
+<div class="prose noprint" id="slots">
+  <h2>The slot grid</h2>
+  <p class="lede">Seven one-hour slots (A–G) and four ninety-minute slots (P–S). Every course sits in exactly one.
+     Two courses in the same letter always clash — that is the whole rule.</p>
+  <div style="overflow-x:auto">
+  <table class="dl" style="min-width:620px">
+    <thead><tr><th></th><th>09:00</th><th>10:00</th><th>11:00</th><th>12:00</th>
+      <th>12:55</th><th>14:30</th><th>16:00</th></tr></thead>
+    <tbody id="slotref"></tbody>
+  </table>
+  </div>
+  <p style="margin-top:14px"><b>No instructor will move a slot for one student.</b> The department says this outright,
+     so treat the grid as fixed. Wednesday afternoon is Challenge Lectures, which is why slot F is the odd one —
+     two mornings plus a Wednesday afternoon, where every other letter has three mornings.</p>
+</div>
+
+<!-- SENIORS -->
+<div class="prose noprint" id="seniors">
+  <h2>What your seniors took</h2>
+  <p class="lede">Engineering electives chosen by the 2024–26 and 2025–27 batches, from the department's own
+     orientation deck. Reference only — check the current outline and prerequisites before copying anyone.</p>
+  <div class="faults" id="seniorlist"></div>
+</div>
+
+<!-- DEADLINES -->
+<div class="prose noprint" id="dates">
+  <h2>Dates that matter</h2>
+  <p class="lede">Jul–Nov 2026 academic calendar. Drop windows depend on how many credits the course carries.</p>
+  <table class="dl">
+    <thead><tr><th>Segment</th><th>Classes start</th><th>Last date to add</th><th>Last date to drop</th></tr></thead>
+    <tbody>
+      <tr class="hot"><td class="mono">AIMS portal closes</td><td>—</td><td colspan="2"><b>31 July 2026, 23:59</b> — earlier than the calendar below. This is the one that locks.</td></tr>
+      <tr><td class="mono">1–2</td><td>27 Jul</td><td>3 Aug</td><td>3 Aug</td></tr>
+      <tr><td class="mono">1–3</td><td>27 Jul</td><td>3 Aug</td><td>5 Aug</td></tr>
+      <tr><td class="mono">1–4</td><td>27 Jul</td><td>3 Aug</td><td>10 Aug</td></tr>
+      <tr><td class="mono">1–6</td><td>27 Jul</td><td>3 Aug</td><td>10 Aug</td></tr>
+      <tr><td class="mono">3–4</td><td>31 Aug</td><td>7 Sep</td><td>7 Sep</td></tr>
+      <tr><td class="mono">3–6</td><td>31 Aug</td><td>7 Sep</td><td>14 Sep</td></tr>
+      <tr><td class="mono">4–6</td><td>17 Sep</td><td>23 Sep</td><td>28 Sep</td></tr>
+      <tr><td class="mono">5–6</td><td>6 Oct</td><td>12 Oct</td><td>12 Oct</td></tr>
+    </tbody>
+  </table>
+  <h3 style="font-size:14.5px;font-weight:640;margin:22px 0 6px">Things worth knowing</h3>
+  <p><b>No dropping after the add/drop period, even with a fine.</b> Every add and drop needs your Faculty Advisor's
+     approval, so leave time. A semester is six segments of about 2.5 to 3 weeks; one segment is half a credit, which
+     is why a 3-credit course spans segments 1–6 and a 1-credit course spans two.</p>
+  <p><b>Type conversion is one-time and irreversible</b>, capped at 3 credits. It changes an elective from one category
+     to another and you submit a form declaring the change. The department is explicit that it cannot be repeated.
+     Contact <code>office.acad@iith.ac.in</code>.</p>
+  <p><b>Grades run A+, A, A-, B, B-, C, C-, D</b> at 10, 10, 9, 8, 7, 6, 5 and 4 points, with F at zero. A+ and A both
+     carry 10. The Senate mandates no minimum attendance, but an instructor may put up to 10% of the marks on it.</p>
+</div>
+</main>
+
+<footer class="noprint">
+  <div class="wrap">
+    <div class="fgrid">
+      <div>
+        <a class="logo" href="#"><span class="logomark">EM</span> Course Planner</a>
+        <p class="blurb">An unofficial planning tool for M.Tech Techno-Entrepreneurship students at IIT Hyderabad.
+          Always confirm in AIMS before you submit.</p>
+      </div>
+      <div><h5>Plan</h5><a href="#how">Register in AIMS</a><a href="#calendar">Calendar</a>
+      <a href="#difficulty">Is it easy?</a>
+      <a href="#fractal">Fractal system</a>
+      <a href="#slots">Slot grid</a><a href="#dates">Dates</a></div>
+      <div><h5>Decide</h5><a href="#faults">AIMS friction</a><a href="#mistakes">8 ways to get it wrong</a>
+      <a href="#glossary">Glossary</a>
+      <a href="#seniors">Seniors' picks</a></div>
+      <div><h5>Contact</h5>
+        <a href="mailto:nakul@em.iith.ac.in">Dr. Nakul Parameswar · DPGC</a>
+        <a href="mailto:ranapratap@em.iith.ac.in">Dr. Ranapratap Maradana · FA</a>
+        <a href="mailto:office@em.iith.ac.in">EM department office</a>
+        <a href="mailto:office.acad@iith.ac.in">Academic Section</a>
+      </div>
+    </div>
+    <div class="fbot">
+      <span>Slots read from the 25 departmental timetables published for Jul–Nov 2026 and cross-checked against
+        live AIMS records. Curriculum from the department orientation deck.</span>
+      <span>Unofficial. Verify before you register.</span>
+    </div>
+  </div>
+</footer>
+
+<div id="pop" role="tooltip"></div>
+<div id="dbg"></div>
+<aside id="drawer" role="dialog" aria-modal="true" aria-label="Course details">
+  <div class="dhead">
+    <div><div class="dc" id="dcode"></div><div class="dt" id="dtitle"></div></div>
+    <button class="dclose" id="dclose" type="button" aria-label="Close">&times;</button>
+  </div>
+  <div id="dbody"></div>
+</aside>
+
+<script>
+/*__DATA__*/
+</script>
+<script>
+/*__APP__*/
+</script>
+</body>
+</html>

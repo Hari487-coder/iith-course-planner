@@ -1,0 +1,2622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#7A1F2B">
+<title>EM Course Planner — IITH Techno-Entrepreneurship</title>
+<style>
+/* ============================================================
+   SCPT THEME — a drop-in UI skin
+   ------------------------------------------------------------
+   Pure presentation. No layout assumptions beyond the classes
+   below, no JS, no fonts to load, no build step.
+
+   Apply by adding these class names to your existing markup.
+   Nothing here depends on the demo page's data or features.
+
+   Sections:
+     1  Tokens
+     2  Base + typography
+     3  Header & nav
+     4  Hero (dark band)
+     5  Cards & section headers
+     6  Controls: buttons, inputs, slider, segmented
+     7  Data rows (the list pattern)
+     8  Badges, pills, flags
+     9  Stat block & chart chrome
+    10  Prose, numbered steps, feature cards
+    11  Footer
+    12  Responsive
+   ============================================================ */
+
+
+/* ---------- 1  TOKENS ---------------------------------------
+   Change --brand and --brand-text to reskin the whole thing.
+   --brand      fills, accents, chart marks, focus rings
+   --brand-text same hue darkened to clear 4.5:1 on white, for
+                text and links. Do not use --brand on small text:
+                #B87333 is only 3.79:1 and fails WCAG AA.
+   ------------------------------------------------------------ */
+:root{
+  --paper:#F6F5F1;      /* page background   */
+  --card:#FFFFFF;       /* card surface      */
+  --ink:#1A1A18;        /* primary text, dark bands */
+  --ink2:#4A4E55;       /* body / secondary  */
+  --ink3:#5E656D;       /* labels            */
+  --ink4:#8B9199;       /* meta, axis text   */
+  --line:#E2E0DA;       /* borders           */
+  --line2:#CDCAC2;      /* input borders     */
+  --hover:#FCFBF9;      /* row hover         */
+
+  --brand:#B87333;      /* copper            */
+  --brand-text:#8F5620; /* copper, 5.97:1 on white */
+  --brand-wash:#F6EDE3; /* selected rows, active segment */
+  --brand-deep:#231404; /* text on a brand fill */
+  --brand-hover:#A6672D;
+
+  --good:#0F766E;  --good-wash:#E2F1EF;
+  --bad:#B3234C;   --bad-wash:#FBE9EE;
+  --warn:#8A5200;  --warn-wash:#FBF0DF;
+
+  --radius:9px;
+  --radius-sm:7px;
+  --font:ui-sans-serif,-apple-system,"Segoe UI",Inter,Roboto,Helvetica,Arial,sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+}
+
+
+/* ---------- 2  BASE + TYPOGRAPHY ---------------------------- */
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--paper); color:var(--ink);
+  font-family:var(--font); font-size:15px; line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{margin:0;letter-spacing:-.018em}
+a{color:var(--brand-text)}
+:focus-visible{outline:2px solid var(--brand);outline-offset:2px;border-radius:3px}
+
+/* every number on the page: tabular so columns align */
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+/* the small caps label used above every group */
+.eyebrow,.fl,.statlabel,.lbl,.card>.ch h2,footer h5{
+  font-size:10.5px;letter-spacing:.15em;text-transform:uppercase;font-weight:640
+}
+
+.wrap{max-width:1160px;margin:0 auto;padding:0 20px}
+
+
+/* ---------- 3  HEADER & NAV --------------------------------- */
+header{background:var(--ink);color:#F6F5F1}
+.navbar{display:flex;align-items:center;gap:26px;padding:15px 0}
+.logo{display:flex;align-items:center;gap:10px;font-weight:680;font-size:15.5px;
+  letter-spacing:-.01em;color:#F6F5F1;text-decoration:none}
+.logomark{width:26px;height:26px;border-radius:6px;background:var(--brand);
+  display:grid;place-items:center;font-size:12px;font-weight:800;color:var(--brand-deep);flex:none}
+nav.main{display:flex;gap:20px;margin-left:auto;flex-wrap:wrap}
+nav.main a{color:#A7ADB5;text-decoration:none;font-size:13.5px;transition:color .15s}
+nav.main a:hover{color:#F6F5F1}
+.oplogin{border:1px solid #3A3E45;border-radius:6px;padding:6px 13px;font-size:13px;color:#C9CED4!important}
+.oplogin:hover{border-color:#6B7178}
+
+
+/* ---------- 4  HERO (dark band) ----------------------------- */
+.hero{background:var(--ink);color:#F6F5F1;padding:12px 0 44px}
+.hero .eyebrow{color:var(--brand);margin-bottom:12px}
+.hero h1{font-size:38px;line-height:1.08;font-weight:680;max-width:19ch}
+.hero .sub{margin:14px 0 0;font-size:15px;color:#A7ADB5;max-width:52ch}
+.hero .sub b{color:#F6F5F1;font-weight:600}
+
+/* a white card floating on the dark band */
+.searchcard{background:var(--card);border-radius:10px;padding:20px;margin-top:26px;color:var(--ink)}
+/* a dark card on the dark band */
+.darkpanel{border:1px solid #34383F;border-radius:10px;background:#1F2229;padding:20px}
+
+
+/* ---------- 5  CARDS & SECTION HEADERS ---------------------- */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);margin-bottom:22px}
+.card > .ch{display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  padding:15px 18px;border-bottom:1px solid var(--line)}
+.card > .ch h2{color:var(--ink3)}
+.chnote{margin-left:auto;font-size:12px;color:var(--ink4)}
+
+/* a strip of controls directly under a card header */
+.ctrls{display:flex;gap:9px;flex-wrap:wrap;align-items:center;
+  padding:13px 18px;border-bottom:1px solid var(--line);background:var(--hover)}
+.ctrls .lbl{color:var(--ink4);font-size:11px}
+.count{margin-left:auto;font-size:12.5px;color:var(--ink3)}
+
+
+/* ---------- 6  CONTROLS ------------------------------------- */
+.btn{
+  font:inherit;font-size:14.5px;font-weight:620;padding:11px 22px;border-radius:var(--radius-sm);
+  cursor:pointer;border:1px solid var(--brand);background:var(--brand);color:var(--brand-deep);
+  transition:.15s;white-space:nowrap
+}
+.btn:hover{background:var(--brand-hover);border-color:var(--brand-hover)}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line2)}
+.btn.ghost:hover{background:#fff;border-color:var(--ink)}
+.btn.sm{padding:7px 13px;font-size:13px}
+.btn.dark{background:var(--ink);border-color:var(--ink);color:#F6F5F1}
+.btn.dark:hover{opacity:.86;background:var(--ink)}
+
+input[type=text],input[type=search],input[type=email],select,textarea{
+  font:inherit;font-size:15px;padding:11px 13px;border:1px solid var(--line2);
+  border-radius:var(--radius-sm);background:#fff;color:var(--ink);width:100%
+}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--brand);outline-offset:1px;border-color:var(--brand)}
+label.fl{display:block;color:var(--ink3);margin-bottom:7px}
+
+input[type=range]{width:100%;accent-color:var(--brand);height:22px;cursor:pointer}
+input[type=checkbox],input[type=radio]{accent-color:var(--brand);width:15px;height:15px;cursor:pointer}
+
+/* segmented control — the filter/toggle pattern */
+.seg{display:flex;border:1px solid var(--line2);border-radius:var(--radius-sm);overflow:hidden;background:#fff}
+.seg button{background:transparent;border:0;font:inherit;font-size:12.5px;font-weight:560;
+  color:var(--ink3);padding:7px 13px;cursor:pointer;transition:.13s;white-space:nowrap}
+.seg button + button{border-left:1px solid var(--line)}
+.seg button.on{background:var(--brand-wash);color:var(--brand-text);font-weight:660}
+
+
+/* ---------- 7  DATA ROWS ------------------------------------
+   The core list pattern: rank · identity (grows) · figures
+   (fixed, right-aligned) · action. Add .best to highlight one.
+   ------------------------------------------------------------ */
+.row{display:flex;gap:14px;align-items:center;padding:13px 18px;
+  border-bottom:1px solid #F1EFEA;transition:background .13s}
+.row:last-child{border-bottom:0}
+.row:hover{background:var(--hover)}
+.row.best{background:var(--brand-wash)}
+.row.best:hover{background:#F2E5D6}
+
+.rk{flex:none;width:26px;font-size:12px;font-weight:700;color:var(--ink4);text-align:right}
+.row.best .rk{color:var(--brand-text)}
+
+.yinfo{flex:1;min-width:0}
+.yname{font-size:14.5px;font-weight:640;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ymeta{font-size:12px;color:var(--ink3);margin-top:2px}
+
+.pricebox{flex:none;text-align:right;min-width:104px}
+.pr{font-size:19px;font-weight:700;letter-spacing:-.02em;line-height:1.1}
+.row.best .pr{color:var(--brand-text)}
+.pru{font-size:11px;color:var(--ink4);margin-top:1px}
+.delta{font-size:11.5px;font-weight:620;margin-top:2px}
+.delta.pos{color:var(--good)} .delta.neg{color:var(--bad)}
+
+.distbox{flex:none;width:74px;text-align:right}
+.dist{font-size:14px;font-weight:620}
+.distu{font-size:11px;color:var(--ink4)}
+.act{flex:none}
+
+.empty{padding:40px 18px;text-align:center;color:var(--ink3);font-size:14px}
+.empty b{display:block;color:var(--ink);font-size:15px;margin-bottom:5px}
+
+
+/* ---------- 8  BADGES, PILLS, FLAGS -------------------------
+   Every status is a pastel wash + a dark text of the same hue,
+   never colour alone — each carries a word.
+   ------------------------------------------------------------ */
+.pill{font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;
+  padding:2px 6px;border-radius:3px;white-space:nowrap}
+.pill.good{background:var(--good-wash);color:var(--good)}
+.pill.bad {background:var(--bad-wash); color:var(--bad)}
+.pill.warn{background:var(--warn-wash);color:var(--warn)}
+.pill.mute{background:var(--line);      color:var(--ink3)}
+.pill.brand{background:var(--brand-wash);color:var(--brand-text)}
+
+/* a slightly larger badge, e.g. a code or a slot letter */
+.tag{font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;letter-spacing:.04em;
+  background:var(--brand-wash);color:var(--brand-text)}
+.tag.mute{background:var(--line);color:var(--ink3)}
+
+
+/* ---------- 9  STAT BLOCK & CHART CHROME -------------------- */
+.statlabel{color:var(--ink3)}
+.stathero{font-size:44px;font-weight:700;letter-spacing:-.03em;line-height:1;margin:11px 0 0}
+.statunit{font-size:13px;color:var(--ink3);margin-top:5px}
+.statdelta{font-size:13.5px;font-weight:640;margin-top:11px}
+.statdelta.pos{color:var(--good)} .statdelta.neg{color:var(--bad)}
+.statdelta .per{color:var(--ink4);font-weight:500;font-size:12px;display:block;margin-top:2px}
+.statfoot{font-size:11.5px;color:var(--ink4);margin-top:14px;line-height:1.5}
+
+.chartwrap{padding:14px 16px 6px;position:relative}
+.charthead{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:6px}
+.charttitle{font-size:13px;font-weight:620;color:var(--ink2)}
+svg.chart{display:block;width:100%;touch-action:none}
+/* chart marks, if you draw one: 2px line in var(--brand),
+   area fill same hue at 10%, 1px solid gridlines in #EAE8E2,
+   end dot r=4.5 with a 2px ring in the surface colour.        */
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:#F6F5F1;border-radius:6px;
+  padding:8px 11px;font-size:12px;opacity:0;transition:opacity .1s;white-space:nowrap;z-index:5;
+  box-shadow:0 4px 14px rgba(0,0,0,.18)}
+.tip .v{font-size:15px;font-weight:700;letter-spacing:-.01em}
+.tip .d{color:#A7ADB5;font-size:11px;margin-top:2px}
+.tip .key{display:inline-block;width:12px;height:2px;background:var(--brand);
+  vertical-align:3px;margin-right:6px;border-radius:1px}
+
+/* data table, e.g. a chart's table view */
+table.tv{width:100%;border-collapse:collapse;font-size:12.5px}
+table.tv th{text-align:left;font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink4);font-weight:640;padding:0 10px 7px;border-bottom:1px solid var(--line)}
+table.tv td{padding:6px 10px;border-bottom:1px solid #F3F1EC}
+
+
+/* ---------- 10  PROSE, STEPS, FEATURE CARDS ----------------- */
+.prose{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);
+  padding:26px 28px;margin-bottom:22px}
+.prose h2{font-size:20px;font-weight:670;margin-bottom:5px}
+.prose .lede{font-size:13.5px;color:var(--ink3);margin:0 0 22px;max-width:70ch}
+.prose p{margin:0 0 11px;font-size:14px;color:var(--ink2);line-height:1.62;max-width:74ch}
+.prose code{background:#F0EEE9;padding:1.5px 5px;border-radius:3px;font-size:12.5px;font-family:var(--mono)}
+
+/* numbered steps with dark circular counters */
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px;
+  counter-reset:s;list-style:none;margin:0;padding:0}
+.steps li{counter-increment:s;position:relative;padding-left:42px}
+.steps li::before{content:counter(s);position:absolute;left:0;top:0;width:28px;height:28px;
+  border-radius:50%;background:var(--ink);color:#F6F5F1;font-size:12.5px;font-weight:680;
+  display:flex;align-items:center;justify-content:center}
+.steps .st{font-size:15px;font-weight:640;margin-bottom:4px}
+.steps .sd{font-size:13.5px;color:var(--ink2);line-height:1.58}
+
+/* card grid — features, grades, anything that comes in threes */
+.gcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(258px,1fr));gap:15px}
+.gcard{border:1px solid var(--line);border-radius:8px;padding:17px 18px;background:var(--hover)}
+.gcard .swatch{width:100%;height:5px;border-radius:3px;margin-bottom:13px;background:var(--brand)}
+.gcard h4{font-size:15px;font-weight:660;margin-bottom:5px}
+.gcard p{margin:0;font-size:13px;color:var(--ink2);line-height:1.55}
+.gcard .lk{display:inline-block;margin-top:11px;font-size:13px;font-weight:600}
+
+/* a link presented as a card */
+.tradecard{border:1px solid var(--line);border-radius:8px;padding:14px 16px;
+  text-decoration:none;color:inherit;transition:.15s;display:block}
+.tradecard:hover{border-color:var(--brand);background:var(--hover)}
+.tradecard .tt{font-size:14px;font-weight:640;margin-bottom:3px}
+.tradecard .td{font-size:12.5px;color:var(--ink3)}
+
+/* callout — an amber-bordered aside inside prose */
+.gotcha{border-left:3px solid var(--warn);background:var(--warn-wash);
+  padding:11px 14px;border-radius:0 5px 5px 0;margin:9px 0 15px}
+.gotcha .g{font-size:10px;letter-spacing:.13em;text-transform:uppercase;color:var(--warn);
+  font-weight:700;margin-bottom:3px}
+.gotcha p{margin:0;font-size:13px;color:#6B4A18}
+
+
+/* ---------- 11  FOOTER -------------------------------------- */
+footer{background:var(--ink);color:#A7ADB5;padding:38px 0 30px;font-size:13.5px}
+.fgrid{display:grid;grid-template-columns:minmax(0,1.6fr) repeat(3,minmax(0,1fr));gap:28px}
+footer h5{color:#7C838C;margin:0 0 11px}
+footer a{color:#A7ADB5;text-decoration:none;display:block;padding:3px 0}
+footer a:hover{color:#F6F5F1}
+footer .blurb{max-width:38ch;line-height:1.6;margin:12px 0 0;color:#8B9199}
+.fbot{margin-top:30px;padding-top:18px;border-top:1px solid #2C3037;font-size:12px;color:#7C838C;
+  display:flex;gap:16px;flex-wrap:wrap;justify-content:space-between}
+
+
+/* ---------- 12  RESPONSIVE ---------------------------------- */
+@media (max-width:900px){
+  .herogrid{grid-template-columns:1fr!important;gap:26px}
+}
+@media (max-width:760px){
+  .fgrid{grid-template-columns:1fr 1fr}
+}
+@media (max-width:640px){
+  .navbar{flex-wrap:wrap;gap:12px}
+  .logo{flex:none;white-space:nowrap}
+  nav.main{flex-basis:100%;margin-left:0;gap:14px;row-gap:8px}
+  .hero h1{font-size:26px}
+}
+@media (max-width:640px){
+  .stathero{font-size:34px}
+  /* data rows reflow: identity on its own line, action full width */
+  .row{flex-wrap:wrap;gap:10px}
+  .yinfo{flex-basis:100%;order:1}
+  .rk{order:0}
+  .distbox{order:2;text-align:left;width:auto}
+  .pricebox{order:3;text-align:left;min-width:0;margin-left:auto}
+  .act{order:4;flex-basis:100%}
+  .act .btn{width:100%}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+
+/* ============================================================
+   BRAND OVERRIDE — academic maroon instead of copper.
+   Maroon clears 10.2:1 on white, so unlike copper one value
+   serves both fills and text. Text sitting ON a maroon fill
+   must be light, hence --brand-deep flips to near-white.
+   ============================================================ */
+:root{
+  --brand:#7A1F2B;
+  --brand-text:#7A1F2B;
+  --brand-wash:#F3E7E9;
+  --brand-deep:#FBF7F6;
+  --brand-hover:#661924;
+  --ink3:#5E656D;
+  /* course-block hues — identity, not status */
+  --core:#1E3A5F;   --core-wash:#E6ECF3;   --core-line:#BCCBDE;
+  --elec:#5B4A7D;   --elec-wash:#EDE9F3;   --elec-line:#CFC5DF;
+  --engg:#0F766E;   --engg-wash:#E2F1EF;   --engg-line:#B4D9D4;
+  --mand:#6B5B44;   --mand-wash:#F2EEE6;   --mand-line:#D6CDBC;
+}
+
+/* ---------- hero: semester switch on the dark band ---------- */
+.seg.ondark{border-color:#3A3E45;background:transparent}
+.seg.ondark button{color:#A7ADB5}
+.seg.ondark button + button{border-left-color:#3A3E45}
+.seg.ondark button.on{background:#F6F5F1;color:var(--ink)}
+.herobar{display:flex;flex-wrap:wrap;gap:22px;align-items:flex-end;justify-content:space-between}
+
+/* ---------- two-column workspace ---------- */
+.cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.28fr);gap:24px;align-items:start}
+@media (max-width:940px){.cols{grid-template-columns:minmax(0,1fr)}}
+
+/* ---------- requirement groups ---------- */
+.grp{border-bottom:1px solid var(--line)}
+.grp:last-child{border-bottom:0}
+.ghead{display:flex;align-items:center;gap:11px;padding:13px 18px 11px;background:var(--hover)}
+.gname{font-size:14px;font-weight:620}
+.gtally{margin-left:auto;font-size:12px;font-weight:640;padding:3px 9px;border-radius:20px;white-space:nowrap}
+.gtally.done{background:var(--good-wash);color:var(--good)}
+.gtally.todo{background:var(--line);color:var(--ink3)}
+.gtally.over{background:var(--bad-wash);color:var(--bad)}
+.grule{padding:0 18px 11px;font-size:12.5px;color:var(--ink3);line-height:1.5}
+
+label.crs{display:flex;gap:11px;align-items:flex-start;padding:10px 18px;cursor:pointer;
+  border-top:1px solid #F0EEE9;transition:background .13s}
+label.crs:hover{background:var(--hover)}
+label.crs input{margin:3px 0 0;flex:none}
+label.crs.dis{opacity:.55;cursor:not-allowed}
+label.crs.dis input{cursor:not-allowed}
+.cmain{flex:1;min-width:0}
+.ccode{font-size:13px;font-weight:660;letter-spacing:.01em;font-family:var(--mono)}
+.ctitle{font-size:12.5px;color:var(--ink2);margin-top:1px}
+.cmeta{font-size:11.5px;color:var(--ink3);margin-top:3px}
+.cright{flex:none;text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.slotbadge{font-size:11px;font-weight:700;padding:2px 8px;border-radius:4px;letter-spacing:.04em;
+  background:var(--core-wash);color:var(--core);font-family:var(--mono)}
+.slotbadge.none{background:var(--line);color:var(--ink3)}
+.cr{font-size:11.5px;color:var(--ink3)}
+.flag{font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;padding:2px 6px;border-radius:3px}
+.flag.blocked,.flag.clash{background:var(--bad-wash);color:var(--bad)}
+.flag.off,.flag.next{background:var(--line);color:var(--ink3)}
+.flag.noslot{background:var(--warn-wash);color:var(--warn)}
+
+/* ---------- engineering elective picker ---------- */
+.epick{padding:14px 18px 16px}
+.searchrow{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:11px}
+#esearch{flex:1;min-width:170px;font-size:13.5px;padding:8px 11px}
+.filtoggle{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--ink2);cursor:pointer;user-select:none}
+.elist{max-height:340px;overflow-y:auto;border:1px solid var(--line);border-radius:var(--radius-sm)}
+.erow{display:flex;gap:10px;align-items:center;padding:9px 12px;cursor:pointer;
+  border-bottom:1px solid #F2F0EB;font-size:13px}
+.erow:last-child{border-bottom:0}
+.erow:hover{background:var(--hover)}
+.erow.sel{background:var(--engg-wash);box-shadow:inset 3px 0 0 var(--engg)}
+.erow.clash{opacity:.5}
+.erow.clash:hover{background:var(--bad-wash);opacity:.78}
+.ecode{font-weight:660;flex:none;width:64px;font-family:var(--mono)}
+.etitle{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink2)}
+.edept{flex:none;font-size:11px;color:var(--ink3);width:96px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ecount{font-size:12px;color:var(--ink3);margin-top:9px}
+.vdot{width:6px;height:6px;border-radius:50%;background:var(--engg);flex:none}
+.vdot.un{background:var(--line2)}
+.customrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px;padding-top:13px;border-top:1px dashed var(--line2)}
+.customrow input,.customrow select{padding:7px 10px;font-size:13px;width:auto}
+#ccode{width:96px} #ccr{width:62px} #cname{flex:1;min-width:120px}
+
+/* ---------- credit total bar ---------- */
+.totalbar{display:flex;align-items:baseline;gap:12px;padding:15px 18px;
+  border-bottom:1px solid var(--line);flex-wrap:wrap}
+.totalbar .n{font-size:30px;font-weight:680;letter-spacing:-.025em;line-height:1;font-family:var(--mono)}
+.totalbar .n.ok{color:var(--good)} .totalbar .n.no{color:var(--bad)}
+.totalbar .of{font-size:14px;color:var(--ink3)}
+.totalbar .lab{font-size:11px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink3);margin-left:auto}
+
+/* ---------- status messages ---------- */
+.stat{padding:15px 18px;border-bottom:1px solid var(--line)}
+.stat:last-of-type{border-bottom:1px solid var(--line)}
+.stat.good{background:var(--good-wash)}
+.stat.bad{background:var(--bad-wash)}
+.stat.warn{background:var(--warn-wash)}
+.stat h3{font-size:13.5px;font-weight:660;margin-bottom:4px}
+.stat.good h3{color:var(--good)} .stat.bad h3{color:var(--bad)} .stat.warn h3{color:var(--warn)}
+.stat p{margin:0;font-size:12.5px;color:var(--ink2);line-height:1.5}
+.stat p + p{margin-top:5px}
+
+/* ---------- week grid ---------- */
+.gridscroll{overflow-x:auto}
+table.wk{border-collapse:collapse;width:100%;min-width:530px;table-layout:fixed}
+table.wk th,table.wk td{border:1px solid var(--line);padding:0}
+table.wk thead th{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);
+  font-weight:620;padding:9px 6px;background:var(--hover)}
+table.wk tbody th{font-size:11px;color:var(--ink3);font-weight:500;padding:7px 9px;text-align:right;
+  background:var(--hover);white-space:nowrap;width:72px;font-family:var(--mono)}
+td.c{height:56px;vertical-align:top;padding:4px;position:relative}
+td.c.free{background:repeating-linear-gradient(135deg,#fff,#fff 6px,#FAF9F5 6px,#FAF9F5 12px)}
+.sl{position:absolute;top:3px;right:5px;font-size:9.5px;color:#C3C0B8;font-weight:600;font-family:var(--mono)}
+.bk{border-radius:4px;padding:4px 5px;height:100%;display:flex;flex-direction:column;
+  justify-content:center;overflow:hidden}
+.bk .a{font-size:11px;font-weight:700;line-height:1.2;letter-spacing:-.01em;font-family:var(--mono)}
+.bk .b{font-size:9px;line-height:1.22;opacity:.8;margin-top:1px;overflow:hidden}
+.bk.core{background:var(--core-wash);border:1px solid var(--core-line);color:var(--core)}
+.bk.mgmt{background:var(--elec-wash);border:1px solid var(--elec-line);color:var(--elec)}
+.bk.eng {background:var(--engg-wash);border:1px solid var(--engg-line);color:var(--engg)}
+.bk.mand{background:var(--mand-wash);border:1px solid var(--mand-line);color:var(--mand)}
+.bk.bad{background:var(--bad-wash);border:1.5px solid var(--bad);color:var(--bad)}
+.legend{display:flex;flex-wrap:wrap;gap:16px;font-size:12px;color:var(--ink3);padding:13px 18px 0}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.actions{display:flex;gap:9px;flex-wrap:wrap;padding:15px 18px}
+
+/* ---------- reference tables ---------- */
+table.dl{width:100%;border-collapse:collapse;font-size:13.5px;margin-top:4px}
+table.dl th{text-align:left;font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);
+  font-weight:620;padding:0 10px 9px;border-bottom:1px solid var(--line)}
+table.dl td{padding:10px;border-bottom:1px solid #F0EEE9}
+table.dl tr:last-child td{border-bottom:0}
+table.dl tr.hot td{background:var(--bad-wash)}
+.faults{display:grid;grid-template-columns:repeat(auto-fit,minmax(268px,1fr));gap:14px;margin-top:6px}
+.fault{border:1px solid var(--line);border-radius:8px;padding:15px 16px;background:var(--hover)}
+.fault .n{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--brand);font-weight:700;margin-bottom:6px}
+.fault h4{margin:0 0 6px;font-size:13.5px;font-weight:640}
+.fault p{margin:0;font-size:12.8px;color:var(--ink2);line-height:1.55}
+.fault .fix{margin-top:9px;padding-top:9px;border-top:1px solid var(--line);font-size:12.5px;color:var(--good)}
+.fault .fix b{color:var(--good);font-weight:660}
+.prose ol.steps > li{padding-bottom:16px}
+
+
+/* ================= NEW IN V3 ================= */
+[hidden]{display:none!important}
+
+/* ---------- readiness strip in the hero ---------- */
+.readywrap{margin-top:22px;background:#1F2229;border:1px solid #34383F;border-radius:10px;padding:15px 18px}
+.readyhead{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.readyhead .rt{font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--brand);font-weight:640}
+.readyhead .rn{margin-left:auto;font-size:13px;color:#A7ADB5}
+.readyhead .rn b{color:#F6F5F1}
+.bar{height:5px;border-radius:3px;background:#34383F;margin:11px 0 13px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--brand);transition:width .3s;border-radius:3px}
+.rsteps{display:flex;gap:7px;flex-wrap:wrap}
+.rstep{font-size:11.5px;padding:4px 10px;border-radius:20px;background:#2A2E36;color:#8B9199;
+  display:flex;align-items:center;gap:6px;white-space:nowrap}
+.rstep.done{background:rgba(15,118,110,.22);color:#5FCBBB}
+.rstep.blocked{background:rgba(179,35,76,.2);color:#F09CB4}
+.rstep .tick{font-weight:800;font-size:11px}
+
+/* ---------- start-here explainer ---------- */
+.startcard{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);margin-bottom:22px;overflow:hidden}
+.starthead{display:flex;align-items:center;gap:12px;padding:15px 18px;cursor:pointer;background:var(--brand-wash)}
+.starthead h2{font-size:13.5px;font-weight:660;color:var(--brand-text)}
+.starthead .hint{margin-left:auto;font-size:12px;color:var(--brand-text);opacity:.8}
+.startbody{padding:4px 18px 18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(232px,1fr));gap:16px}
+.sb{padding-top:14px}
+.sb h4{font-size:13.5px;font-weight:640;margin-bottom:5px}
+.sb p{margin:0;font-size:13px;color:var(--ink2);line-height:1.55}
+
+/* ---------- glossary term + popover ---------- */
+.gterm{border-bottom:1px dashed var(--line2);cursor:help;background:none;border-top:0;border-left:0;border-right:0;
+  font:inherit;color:inherit;padding:0;text-align:left}
+.gterm:hover{border-bottom-color:var(--brand);color:var(--brand-text)}
+#pop{position:absolute;z-index:60;max-width:320px;background:var(--ink);color:#F6F5F1;border-radius:8px;
+  padding:12px 14px;font-size:12.5px;line-height:1.55;box-shadow:0 8px 26px rgba(0,0,0,.24);display:none}
+#pop.on{display:block}
+#pop .pt{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--brand);font-weight:700;margin-bottom:5px}
+
+/* ---------- course detail drawer ---------- */
+#dbg{position:fixed;inset:0;background:rgba(20,20,18,.42);z-index:80;display:none}
+#dbg.on{display:block}
+#drawer{position:fixed;top:0;right:0;bottom:0;width:400px;max-width:92vw;background:var(--card);z-index:90;
+  transform:translateX(100%);transition:transform .22s;overflow-y:auto;box-shadow:-8px 0 30px rgba(0,0,0,.16)}
+#drawer.on{transform:translateX(0)}
+.dhead{position:sticky;top:0;background:var(--ink);color:#F6F5F1;padding:16px 18px;display:flex;align-items:flex-start;gap:12px}
+.dhead .dc{font-family:var(--mono);font-size:18px;font-weight:700;letter-spacing:-.01em}
+.dhead .dt{font-size:12.5px;color:#A7ADB5;margin-top:3px}
+.dclose{margin-left:auto;background:transparent;border:1px solid #3A3E45;color:#C9CED4;border-radius:6px;
+  font:inherit;font-size:16px;line-height:1;padding:5px 10px;cursor:pointer;flex:none}
+.dclose:hover{border-color:#6B7178}
+.dsec{padding:15px 18px;border-bottom:1px solid var(--line)}
+.dsec h5{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink3);font-weight:640;margin:0 0 9px}
+.dkv{display:flex;gap:12px;font-size:13px;padding:4px 0}
+.dkv .k{flex:none;width:104px;color:var(--ink3)}
+.dkv .v{flex:1;min-width:0}
+.dmeet{font-family:var(--mono);font-size:12.5px;background:var(--hover);border:1px solid var(--line);
+  border-radius:6px;padding:8px 11px;margin-top:4px}
+.dmeet div + div{margin-top:3px}
+.codemap{display:flex;gap:3px;font-family:var(--mono);font-size:22px;font-weight:700;margin-bottom:12px}
+.codemap span{padding:3px 5px;border-radius:4px}
+.cm0{background:#E6ECF3;color:#1E3A5F} .cm1{background:var(--brand-wash);color:var(--brand-text)}
+.cm2{background:var(--engg-wash);color:var(--engg)} .cm3{background:var(--line);color:var(--ink3)}
+.codelist{font-size:12.5px;color:var(--ink2);line-height:1.5}
+.codelist b{display:inline-block;min-width:76px;color:var(--ink)}
+
+/* ---------- pre-flight / AIMS script ---------- */
+.scriptrow{display:flex;gap:12px;align-items:center;padding:11px 18px;border-bottom:1px solid #F1EFEA;font-size:13px}
+.scriptrow:last-child{border-bottom:0}
+.srn{flex:none;width:56px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink4);font-weight:640}
+.srtype{flex:1;min-width:0}
+.srtype .l{font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink4);font-weight:640}
+.srtype .v{font-size:13.5px;font-weight:620;margin-top:1px}
+.srcode{flex:none;font-family:var(--mono);font-size:15px;font-weight:700;background:var(--brand-wash);
+  color:var(--brand-text);padding:5px 11px;border-radius:6px}
+.checklist{list-style:none;margin:0;padding:0}
+.checklist li{display:flex;gap:11px;align-items:flex-start;padding:11px 18px;border-bottom:1px solid #F1EFEA}
+.checklist li:last-child{border-bottom:0}
+.checklist input{margin:2px 0 0;flex:none}
+.checklist .ct{font-size:13.5px;font-weight:600}
+.checklist .cd{font-size:12.5px;color:var(--ink3);margin-top:2px;line-height:1.5}
+.blockmsg{padding:26px 18px;text-align:center;color:var(--ink3);font-size:13.5px}
+.blockmsg b{display:block;color:var(--ink);font-size:15px;margin-bottom:5px}
+
+/* ---------- elective picker: dept filter + info button ---------- */
+.einfo{flex:none;width:22px;height:22px;border-radius:50%;border:1px solid var(--line2);background:#fff;
+  color:var(--ink3);font:inherit;font-size:11px;font-weight:700;cursor:pointer;line-height:1;padding:0}
+.einfo:hover{border-color:var(--brand);color:var(--brand-text)}
+.einfo.hasdoc{background:var(--brand-wash);border-color:#DCC3C7;color:var(--brand-text)}
+.einfo.hasdoc:hover{background:var(--brand);border-color:var(--brand);color:#fff}
+#edept{max-width:190px;font-size:13px;padding:8px 10px}
+.erow.untitled .etitle{color:var(--warn);font-style:italic}
+
+/* ---------- code decoder block ---------- */
+.decoder{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;margin-top:16px}
+.dcard{border:1px solid var(--line);border-radius:8px;padding:14px 16px;background:var(--hover)}
+.dcard .dl{font-family:var(--mono);font-size:15px;font-weight:700;margin-bottom:6px}
+.dcard p{margin:0;font-size:12.8px;color:var(--ink2);line-height:1.5}
+
+@media print{ .readywrap,.startcard,#drawer,#dbg,#pop{display:none!important} }
+
+
+/* ============================================================
+   LIGHT — no black anywhere. Paper, white cards, one maroon
+   accent. Every dark surface from the theme is overridden here.
+   ============================================================ */
+:root{ --paper:#FBFAF7; --hover:#FAF8F5; --line:#E7E4DD; --line2:#D3CFC6; }
+
+/* header */
+header{background:#fff;color:var(--ink);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:40}
+.logo{color:var(--ink)}
+.logomark{color:#fff}
+nav.main a{color:var(--ink3)}
+nav.main a:hover{color:var(--brand)}
+
+/* hero */
+.hero{background:linear-gradient(180deg,#FBF5F5 0%,var(--paper) 100%);color:var(--ink);
+  border-bottom:1px solid var(--line);padding:26px 0 30px}
+.hero h1{font-size:32px;max-width:24ch}
+.hero .eyebrow{color:var(--brand)}
+.hero .sub{color:var(--ink2);max-width:60ch}
+.hero .sub b{color:var(--ink)}
+.seg.ondark{border-color:var(--line2);background:#fff}
+.seg.ondark button{color:var(--ink3)}
+.seg.ondark button + button{border-left-color:var(--line)}
+.seg.ondark button.on{background:var(--brand-wash);color:var(--brand-text);font-weight:660}
+
+/* readiness */
+.readywrap{background:#fff;border:1px solid var(--line);border-radius:10px;margin-top:20px}
+.readyhead .rt{color:var(--ink3)}
+.readyhead .rn{color:var(--ink3)}
+.readyhead .rn b{color:var(--ink)}
+.bar{background:var(--line)}
+.rstep{background:var(--paper);color:var(--ink3);border:1px solid var(--line)}
+.rstep.done{background:var(--good-wash);color:var(--good);border-color:#BFE3DD}
+.rstep.blocked{background:var(--bad-wash);color:var(--bad);border-color:#F2C6D2}
+
+/* glossary popover */
+#pop{background:#fff;color:var(--ink2);border:1px solid var(--line2);
+  box-shadow:0 10px 28px rgba(26,26,24,.14)}
+#pop .pt{color:var(--brand)}
+
+/* drawer */
+#dbg{background:rgba(26,26,24,.26)}
+.dhead{background:var(--paper);color:var(--ink);border-bottom:1px solid var(--line)}
+.dhead .dt{color:var(--ink3)}
+.dclose{border-color:var(--line2);color:var(--ink3)}
+.dclose:hover{border-color:var(--brand);color:var(--brand)}
+
+/* numbered steps: maroon discs, not black */
+.steps li::before{background:var(--brand);color:#fff}
+
+/* footer */
+footer{background:#fff;color:var(--ink2);border-top:1px solid var(--line)}
+footer h5{color:var(--ink4)}
+footer a{color:var(--ink2)}
+footer a:hover{color:var(--brand)}
+footer .blurb{color:var(--ink3)}
+.fbot{border-top-color:var(--line);color:var(--ink4)}
+
+/* buttons: keep one solid maroon, everything else outlined */
+.btn.dark{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn.dark:hover{background:var(--brand-hover);border-color:var(--brand-hover)}
+
+/* ---------- ready confirmation ---------- */
+.readycard{border:1px solid #BFE3DD;background:var(--good-wash);border-radius:var(--radius);
+  padding:22px 24px;margin-bottom:22px;display:none}
+.readycard.on{display:block}
+.readycard h2{font-size:19px;font-weight:670;color:var(--good);margin-bottom:6px}
+.readycard p{margin:0 0 14px;font-size:14px;color:#155E56;line-height:1.6;max-width:70ch}
+.readysum{background:#fff;border:1px solid #CDE7E2;border-radius:8px;overflow:hidden}
+.rsrow{display:flex;gap:12px;align-items:center;padding:9px 14px;border-bottom:1px solid #EDF6F4;font-size:13px}
+.rsrow:last-child{border-bottom:0}
+.rsrow .c{font-family:var(--mono);font-weight:700;width:66px;flex:none}
+.rsrow .t{flex:1;min-width:0;color:var(--ink2)}
+.rsrow .s{flex:none;font-family:var(--mono);font-size:12px;color:var(--ink3)}
+
+/* ---------- fractal explainer ---------- */
+.segbar{display:flex;gap:3px;margin:16px 0 8px}
+.segcell{flex:1;background:var(--paper);border:1px solid var(--line);border-radius:5px;
+  padding:9px 6px;text-align:center;font-size:11px;color:var(--ink3)}
+.segcell b{display:block;font-size:13px;color:var(--ink);font-weight:660;margin-bottom:2px}
+.spanrow{display:flex;gap:3px;margin-bottom:7px;align-items:center}
+.spanlab{flex:none;width:112px;font-size:12.5px;color:var(--ink2)}
+.spancell{flex:1;height:22px;border-radius:4px;background:var(--paper);border:1px solid var(--line)}
+.spancell.on{background:var(--brand-wash);border-color:#DCC3C7}
+.spanval{flex:none;width:74px;font-size:12px;color:var(--ink3);text-align:right;font-family:var(--mono)}
+
+/* ---------- workload block in the drawer ---------- */
+.loadbox{background:var(--paper);border:1px solid var(--line);border-radius:6px;padding:11px 13px;margin-top:4px}
+.loadbox .lrow{display:flex;gap:10px;font-size:12.5px;padding:2px 0}
+.loadbox .lrow .lk{flex:none;width:96px;color:var(--ink3)}
+.loadbox .lrow .lv{flex:1;color:var(--ink)}
+
+@media print{ header{position:static} }
+
+/* ---------- print: the carryable timetable ---------- */
+#printlist{display:none;margin-top:14px;font-size:11px}
+#printlist table{width:100%;border-collapse:collapse}
+#printlist td{padding:4px 8px;border-bottom:1px solid #ddd}
+@media print{
+  body{background:#fff;font-size:11px}
+  header,footer{background:#fff;color:#000}
+  header{border-bottom:2px solid #000;padding:0 0 8px}
+  .hero{background:#fff;color:#000;padding:0 0 10px;border-bottom:2px solid #000}
+  .hero h1{font-size:17px;color:#000}
+  .hero .sub,.eyebrow,nav.main,.semtoggle,.noprint,.prose,.card > .ch,.actions,.epick,.legend,
+  #pickcard,footer{display:none!important}
+  .cols{grid-template-columns:1fr;gap:0}
+  .card{border:0;margin:0 0 12px;break-inside:avoid}
+  #wkcard{break-inside:avoid}
+  .totalbar{border:0;padding:10px 0 6px}
+  .totalbar .n{font-size:22px}
+  .stat{border:1px solid #ccc;border-radius:4px;margin:0 0 8px;padding:8px 10px}
+  #printlist{display:block!important}
+  a[href]:after{content:""}
+}
+
+@media (max-width:640px){
+  .navbar{flex-wrap:wrap;gap:12px}
+  .logo{flex:none;white-space:nowrap}
+  nav.main{flex-basis:100%;margin-left:0;gap:14px;row-gap:8px}
+  .hero h1{font-size:26px}
+}
+@media (max-width:520px){
+  .cright{flex-direction:row;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+  label.crs{flex-wrap:wrap}
+  .cmain{flex-basis:100%}
+}
+</style>
+</head>
+<body>
+
+<header class="noprint">
+  <div class="wrap navbar">
+    <a class="logo" href="#"><span class="logomark">EM</span> Course Planner</a>
+    <nav class="main">
+      <a href="#how">Register in AIMS</a>
+      <a href="#faults">Where AIMS trips you up</a>
+      <a href="#calendar">Calendar</a>
+      <a href="#difficulty">Is it easy?</a>
+      <a href="#fractal">Fractal system</a>
+      <a href="#slots">Slot grid</a>
+      <a href="#mistakes">8 ways to get it wrong</a>
+      <a href="#glossary">Glossary</a>
+      <a href="#seniors">Seniors' picks</a>
+      <a href="#dates">Dates</a>
+    </nav>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap herobar">
+    <div>
+      <div class="eyebrow">IIT Hyderabad · Entrepreneurship &amp; Management</div>
+      <h1>M.Tech Techno-Entrepreneurship, planned in one page.</h1>
+      <p class="sub">Tick your courses, watch the week fill, catch clashes before AIMS does.
+        Built for <b>July–November 2026</b> from the official IITH timetables, the department
+        orientation deck and live AIMS data.</p>
+    </div>
+    <div class="seg ondark noprint" id="semtoggle" role="group" aria-label="Semester">
+      <button data-s="1" class="on" type="button">Semester 1</button>
+      <button data-s="2" type="button">Semester 2</button>
+    </div>
+  </div>
+  <div class="wrap noprint">
+    <div class="readywrap">
+      <div class="readyhead">
+        <span class="rt">Are you ready to register</span>
+        <span class="rn" id="rcount"></span>
+      </div>
+      <div class="bar"><i id="rbar" style="width:0%"></i></div>
+      <div class="rsteps" id="rsteps"></div>
+    </div>
+  </div>
+</section>
+
+<main class="wrap" style="padding:30px 0 90px">
+<!-- ===== START HERE ===== -->
+<div class="startcard noprint" id="startcard">
+  <div class="starthead" id="starthead" role="button" tabindex="0" aria-expanded="true" aria-controls="startbody">
+    <h2>New to this? Read these four things first</h2>
+    <span class="hint" id="starthint">Hide</span>
+  </div>
+  <div class="startbody" id="startbody">
+    <div class="sb">
+      <h4>What you are actually choosing</h4>
+      <p>Three <button class="gterm" data-g="core">core</button> courses are compulsory and chosen for you.
+         You pick two 1-credit department electives, and one 3-credit
+         <button class="gterm" data-g="engineering elective">engineering elective</button> from another
+         department. That is 14 <button class="gterm" data-g="credit">credits</button>.</p>
+    </div>
+    <div class="sb">
+      <h4>Why slots decide everything</h4>
+      <p>Every course sits in one <button class="gterm" data-g="slot">slot</button>, a letter that fixes when
+         it meets. Two courses in the same letter clash, and no instructor will move one for you. Your core
+         courses fill slots first; the elective has to fit in what is left.</p>
+    </div>
+    <div class="sb">
+      <h4>The deadline that actually bites</h4>
+      <p>Your department email says 3 August. Every course record in AIMS says registration closes
+         <b>31 July at 23:59</b>. Work to the earlier one — if the portal locks you out on 1 August, the email
+         will not help.</p>
+    </div>
+    <div class="sb">
+      <h4>Pressing Register is not the end</h4>
+      <p>Your <button class="gterm" data-g="fa">Faculty Advisor</button> still has to approve it, and a rejection
+         appears in a collapsed list at the bottom of the AIMS page. Go back and check a day later.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ===== READY CONFIRMATION ===== -->
+<div class="readycard" id="readycard">
+  <h2>You are ready to register</h2>
+  <p id="readytext"></p>
+  <div class="readysum" id="readysum"></div>
+</div>
+
+<div class="cols">
+
+  <div>
+    <div class="card" id="pickcard">
+      <div class="ch"><h2>1 · Choose your courses</h2></div>
+      <div id="groups"></div>
+    </div>
+
+    <div class="card noprint">
+      <div class="ch"><h2>2 · Engineering elective</h2></div>
+      <div class="epick">
+        <div class="searchrow">
+          <input type="text" id="esearch" placeholder="Search 135 courses by code, title or department…">
+          <label class="filtoggle"><input type="checkbox" id="onlyfree" checked> Hide clashes</label>
+        </div>
+        <div class="searchrow">
+          <select id="edept" aria-label="Filter by department"><option value="">All departments</option></select>
+          <label class="filtoggle"><input type="checkbox" id="onlyok" checked> Only ones I can pick</label>
+          <label class="filtoggle"><input type="checkbox" id="onlydoc"> Only ones with a published syllabus</label>
+        </div>
+        <div class="elist" id="elist"></div>
+        <div class="ecount" id="ecount"></div>
+        <div class="customrow">
+          <input type="text" id="ccode" placeholder="Code" maxlength="8">
+          <select id="cslot"><option value="">Slot</option></select>
+          <input type="text" id="ccr" placeholder="Cr" maxlength="4">
+          <input type="text" id="cname" placeholder="Course not in the list? Add it here">
+          <button class="btn ghost sm" id="cadd" type="button">Add</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="card" id="wkcard">
+      <div class="ch"><h2>3 · Your week</h2></div>
+      <div class="totalbar">
+        <span class="n" id="totn">0</span><span class="of">of <span id="totneed">14</span> credits</span>
+        <span class="lab" id="semlab">Semester 1</span>
+      </div>
+      <div id="status"></div>
+      <div class="gridscroll"><table class="wk">
+        <thead><tr><th></th><th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th></tr></thead>
+        <tbody id="wkbody"></tbody>
+      </table></div>
+      <div class="legend noprint">
+        <span><i style="background:var(--core-wash);border:1px solid var(--core-line)"></i>Core</span>
+        <span><i style="background:var(--elec-wash);border:1px solid var(--elec-line)"></i>Department elective</span>
+        <span><i style="background:var(--engg-wash);border:1px solid var(--engg-line)"></i>Engineering elective</span>
+        <span><i style="background:var(--mand-wash);border:1px solid var(--mand-line)"></i>Mandatory</span>
+        <span><i style="background:var(--bad-wash);border:1.5px solid var(--bad)"></i>Clash</span>
+      </div>
+      <div id="printlist"></div>
+      <div class="actions noprint">
+        <button class="btn ghost" id="btnprint" type="button">Print / save as PDF</button>
+        <button class="btn" id="btncal" type="button">Add to Google Calendar</button>
+        <button class="btn ghost" id="btncopy" type="button">Copy as text</button>
+        <button class="btn ghost" id="btnlink" type="button">Copy shareable link</button>
+        <button class="btn ghost" id="btnclear" type="button">Clear</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== PRE-FLIGHT ===== -->
+<div class="card noprint" id="preflight">
+  <div class="ch"><h2>4 · Before you open AIMS</h2>
+    <span class="chnote">Type these rows in this order</span></div>
+  <div style="padding:14px 18px;border-bottom:1px solid var(--line);background:var(--hover)">
+    <label class="filtoggle" style="font-size:13.5px;color:var(--ink)">
+      <input type="checkbox" id="faack">
+      I have spoken to my Faculty Advisor about the engineering elective
+    </label>
+    <p style="margin:6px 0 0 26px;font-size:12.5px;color:var(--ink3);line-height:1.5">
+      The department requires this before you choose one, and only you know whether it happened.
+      Nothing here can check it for you.</p>
+  </div>
+  <div id="scriptbody"></div>
+  <div class="actions" id="scriptactions" hidden>
+    <button class="btn" id="btnscript" type="button">Copy the script</button>
+    <a class="btn ghost" href="https://aims.iith.ac.in/" target="_blank" rel="noopener">Open AIMS</a>
+  </div>
+  <div class="ch" style="border-top:1px solid var(--line)"><h2>Then work down this list</h2></div>
+  <ul class="checklist" id="checklist"></ul>
+</div>
+
+<!-- ===== MISTAKES ===== -->
+<div class="prose noprint" id="mistakes">
+  <h2>Eight ways students get this wrong</h2>
+  <p class="lede">Each one is something AIMS lets you do, or fails to tell you. Each has a matching guard here.</p>
+  <div class="faults" id="mistlist"></div>
+</div>
+
+<!-- ===== CODE DECODER ===== -->
+<div class="prose noprint" id="decode">
+  <h2>Reading a course code</h2>
+  <p class="lede">Two letters and four numbers. Once you can read one, you can tell at a glance whether a course
+     is even allowed to be your engineering elective.</p>
+  <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap">
+    <div class="codemap" aria-hidden="true">
+      <span class="cm0">EM</span><span class="cm1">5</span><span class="cm2">0</span><span class="cm3">90</span>
+    </div>
+    <div class="codelist" id="codelist"></div>
+  </div>
+  <div class="gotcha" style="margin-top:18px">
+    <div class="g">The one that matters</div>
+    <p>Your engineering elective's first digit must be <b>5 or 6</b>. A Level 4 course looks similar and will not
+      count. This planner only lists eligible courses, but check the digit yourself if you add one by hand.</p>
+  </div>
+</div>
+
+<!-- ===== GLOSSARY ===== -->
+<div class="prose noprint" id="glossary">
+  <h2>Every word that trips people up</h2>
+  <p class="lede">Dotted underlines anywhere on this page open the same definitions.</p>
+  <div class="decoder" id="glosslist"></div>
+</div>
+
+<!-- HOW TO REGISTER -->
+<div class="prose noprint" id="how">
+  <h2>How to actually register in AIMS</h2>
+  <p class="lede">Walked through on a live account, 25 July 2026. The gotchas are the parts nobody tells you.</p>
+  <ol class="steps" style="grid-template-columns:1fr">
+    <li>
+      <div class="st">Log in at aims.iith.ac.in</div>
+      <div class="sd">Roll number and password, plus a CAPTCHA. Then <code>Menu → Academic → Course Registration</code>.</div>
+    </li>
+    <li>
+      <div class="st">Pick the right term</div>
+      <div class="sd">Three terms show as "Open" at once — JUL26-NOV26, May-July (Summer) 2026, and JUL25-NOV25.
+        You want <b>JUL26-NOV26</b>. Click <b>Go For Registration</b> on that row.</div>
+      <div class="gotcha"><div class="g">Gotcha</div><p>Old terms staying "Open" is the easiest way to register into the wrong semester. Check the term label before you click.</p></div>
+    </li>
+    <li>
+      <div class="st">Add one row per course</div>
+      <div class="sd">Click the <b>+</b> beside <b>Regular</b>. Each click adds one row — Semester 1 means six rows:
+        three core, two department electives, one engineering elective.</div>
+    </li>
+    <li>
+      <div class="st">Set the Elective Type first, then the course</div>
+      <div class="sd">The course search will not open until an Elective Type is chosen — it just says "Please select
+        elective." Core EM courses go under <b>Departmental Core Theory</b>, your 1-credit electives under
+        <b>Departmental Elective</b>, and the engineering elective normally under <b>Free Elective</b>.</div>
+      <div class="gotcha"><div class="g">Gotcha</div><p>The dropdown offers 14 types with no explanation of which applies to you, and the wrong one can get your whole submission rejected. Ask your FA before submitting, not after.</p></div>
+    </li>
+    <li>
+      <div class="st">Search by course code, not by browsing</div>
+      <div class="sd">Click the blue magnifier. The list opens at <b>10 per page across 60 pages</b>. Change
+        <b>Search By</b> to <b>Course Code</b>, type the code, hit Search.</div>
+    </li>
+    <li>
+      <div class="st">Check every course actually appears</div>
+      <div class="sd">Only 596 of the 786 courses running this term appear in the picker. If a course returns
+        "No records found" it is not registerable for you, even when it is timetabled and its registration window
+        is open. <b>That is the department's to fix, and it will not fix itself.</b> Email them the same day.</div>
+    </li>
+    <li>
+      <div class="st">Add a comment, then Register</div>
+      <div class="sd">Comments cap at 150 characters. After submitting, your Registration Status changes from
+        "–" and your FA has to approve it. Check back — a rejected submission appears under
+        <b>Recent Submission Rejected List</b> at the bottom, which is easy to miss.</div>
+    </li>
+  </ol>
+  <h3 style="font-size:14.5px;font-weight:640;margin:22px 0 6px">Two dates that disagree</h3>
+  <p>Every course record in AIMS says student registration ends <b>31 July 2026, 23:59</b>. The academic calendar
+     and the department's email say the last date to add is <b>3 August 2026</b>. Work to the earlier one.</p>
+</div>
+
+<!-- ANALYSIS -->
+<div class="prose noprint" id="faults">
+  <h2>Where AIMS trips students up</h2>
+  <p class="lede">Seven friction points, each hit firsthand while registering one student. None are the student's fault.</p>
+  <div class="faults">
+    <div class="fault"><div class="n">Fault 01</div><h4>It does not know your curriculum</h4>
+      <p>AIMS shows every student the same 596-course list. Nothing says EM5090 is compulsory for you, or that your
+         engineering elective must be Level 5 or 6. Those rules live in an email.</p>
+      <div class="fix"><b>Here:</b> requirements are built in and counted as you tick.</div></div>
+    <div class="fault"><div class="n">Fault 02</div><h4>No clash detection at all</h4>
+      <p>The picker never shows a slot. You can register two courses in the same slot and find out in week one.
+         The slot data exists, three clicks deep, one course at a time.</p>
+      <div class="fix"><b>Here:</b> clashes are impossible to miss, and clashing options hide by default.</div></div>
+    <div class="fault"><div class="n">Fault 03</div><h4>Courses vanish with no reason given</h4>
+      <p>190 of the 786 running courses are missing from the picker. No message, no greyed-out row — just
+         "No records found," which reads like you typed the code wrong.</p>
+      <div class="fix"><b>Here:</b> known-blocked courses are labelled, with what to do about it.</div></div>
+    <div class="fault"><div class="n">Fault 04</div><h4>Fourteen elective types, no guidance</h4>
+      <p>Departmental Core Theory, Free Elective, FCC, Basic Engineering Skills and ten more. Nothing maps them to
+         your programme, and the same course list appears under every one.</p>
+      <div class="fix"><b>Here:</b> the type to pick is written next to each course group.</div></div>
+    <div class="fault"><div class="n">Fault 05</div><h4>Ten results per page, sixty pages</h4>
+      <p>596 courses paginated ten at a time, alphabetically by title, so "Advanced Cell Biology" comes before
+         anything you need. The page-size control is below the fold.</p>
+      <div class="fix"><b>Here:</b> one search box over the whole catalogue.</div></div>
+    <div class="fault"><div class="n">Fault 06</div><h4>Timetables live somewhere else entirely</h4>
+      <p>Slots are published as 25 separate Google Sheets and PDFs on the academics site, in different formats.
+         Three are not publicly readable at all.</p>
+      <div class="fix"><b>Here:</b> 135 engineering courses with slots, in one list.</div></div>
+    <div class="fault"><div class="n">Fault 07</div><h4>Nothing you can carry</h4>
+      <p>Once registered there is no timetable view, no calendar export, no printable week. Students rebuild it by
+         hand in a notes app, which is where copying errors creep in.</p>
+      <div class="fix"><b>Here:</b> print it, copy it as text, or bookmark the link.</div></div>
+  </div>
+</div>
+
+<!-- ===== CALENDAR ===== -->
+<div class="prose noprint" id="calendar">
+  <h2>Putting your timetable in your phone</h2>
+  <p class="lede">The button in section 3 downloads a calendar file with every class you picked, repeating weekly
+     for the whole semester, plus the deadlines. It works with Google, Apple and Outlook, and asks for no account
+     access at all.</p>
+  <ol class="steps" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr))">
+    <li>
+      <div class="st">Press “Add to Google Calendar”</div>
+      <div class="sd">A file called <code>iith-semester-1.ics</code> lands in your downloads. It contains one
+        repeating event per class meeting, with a reminder 15 minutes before each.</div>
+    </li>
+    <li>
+      <div class="st">Open Google Calendar on a computer</div>
+      <div class="sd">Settings, then <b>Import &amp; export</b>, then <b>Import</b>. Choose the file, pick which
+        calendar to add it to, and press Import. Doing this on a laptop is easier than on a phone.</div>
+    </li>
+    <li>
+      <div class="st">It syncs to your phone by itself</div>
+      <div class="sd">Anything in your Google account appears on your phone within a minute. Nothing else to install.</div>
+    </li>
+  </ol>
+  <div class="gotcha" style="margin-top:16px">
+    <div class="g">Worth knowing</div>
+    <p>Import it into a <b>new, separate calendar</b> named something like “IITH Sem 1”. If your timetable changes
+      you can delete that whole calendar and re-import, instead of hunting for individual events.</p>
+  </div>
+  <p style="margin-top:14px"><b>Just one course?</b> Open it with the ⓘ button and use the Google Calendar link in
+     the drawer. That adds a single weekly meeting — the download is the one that covers everything.</p>
+</div>
+
+<!-- ===== WHY NO DIFFICULTY RATING ===== -->
+<div class="prose noprint" id="difficulty">
+  <h2>Why there is no “easy / hard” rating here</h2>
+  <p class="lede">The most-asked question about electives is which ones are easy. The honest answer is that
+     nobody can tell you from published data, and a made-up rating is worse than none.</p>
+
+  <h3 style="font-size:14.5px;font-weight:640;margin:20px 0 4px">What IITH does not publish</h3>
+  <p><b>No grade distributions.</b> Not on the RTI page, not in the annual report, not on any department site.
+     Grades sit behind the AIMS login. And grading here is <b>relative and set by each instructor</b> — the
+     welcome booklet says outright that it is "based on the Instructor's perception of what an average
+     performance is" — so even a distribution would not transfer between years or teachers.</p>
+  <p><b>No public course feedback.</b> Feedback is collected, and submitting it is compulsory before you can see
+     your grades, but the results are held internally and anonymously. No per-course score is published anywhere.</p>
+  <p><b>No workload guidance beyond contact hours.</b> The only official statement is that one credit is roughly
+     14 to 15 hours of class, usually spread over five weeks. Nothing is published about expected study hours
+     outside class.</p>
+
+  <h3 style="font-size:14.5px;font-weight:640;margin:22px 0 4px">What you can actually go on</h3>
+  <p>Four things, all verifiable, all in this tool. <b>The syllabus</b>, where a department publishes one — open
+     any course with the ⓘ button. <b>The credit weight and length</b>, which fixes the teaching hours exactly.
+     <b>The code's second digit</b>, which tells you whether it is theory, a lab, or design work. And
+     <b>what your seniors took</b>, from the department's own orientation deck.</p>
+  <p>Beyond that, ask. A senior who sat the course last year, or the instructor, knows more than any dataset
+     that exists. That is not a limitation of this tool — it is the actual state of the information.</p>
+</div>
+
+<!-- ===== FRACTAL SYSTEM, EXPLAINED ===== -->
+<div class="prose noprint" id="fractal">
+  <h2>The fractal system, in plain English</h2>
+  <p class="lede">This is the part everyone finds confusing. It is actually one idea: IITH chops the semester into
+     six pieces, and a course can occupy any run of them.</p>
+
+  <h3 style="font-size:14.5px;font-weight:640;margin:20px 0 4px">Your semester is six blocks, not one</h3>
+  <p>Each block is about two and a half to three weeks. They are called <b>segments</b>. A course does not have to
+     run the whole term — it just has to start at one segment and end at another.</p>
+  <div class="segbar">
+    <div class="segcell"><b>1</b>27 Jul</div>
+    <div class="segcell"><b>2</b>—</div>
+    <div class="segcell"><b>3</b>31 Aug</div>
+    <div class="segcell"><b>4</b>—</div>
+    <div class="segcell"><b>5</b>6 Oct</div>
+    <div class="segcell"><b>6</b>ends 13 Nov</div>
+  </div>
+
+  <h3 style="font-size:14.5px;font-weight:640;margin:22px 0 4px">Length is the credit</h3>
+  <p>One segment is half a credit. So the number of segments a course spans <i>is</i> its size — there is nothing
+     else to learn. This is what a course code like &ldquo;segment 1–6&rdquo; or &ldquo;segment 3–4&rdquo; is telling you.</p>
+  <div style="margin-top:14px">
+    <div class="spanrow"><span class="spanlab">Segment 1–2</span>
+      <span class="spancell on"></span><span class="spancell on"></span><span class="spancell"></span>
+      <span class="spancell"></span><span class="spancell"></span><span class="spancell"></span>
+      <span class="spanval">1 credit</span></div>
+    <div class="spanrow"><span class="spanlab">Segment 1–4</span>
+      <span class="spancell on"></span><span class="spancell on"></span><span class="spancell on"></span>
+      <span class="spancell on"></span><span class="spancell"></span><span class="spancell"></span>
+      <span class="spanval">2 credits</span></div>
+    <div class="spanrow"><span class="spanlab">Segment 1–6</span>
+      <span class="spancell on"></span><span class="spancell on"></span><span class="spancell on"></span>
+      <span class="spancell on"></span><span class="spancell on"></span><span class="spancell on"></span>
+      <span class="spanval">3 credits</span></div>
+    <div class="spanrow"><span class="spanlab">Segment 3–4</span>
+      <span class="spancell"></span><span class="spancell"></span><span class="spancell on"></span>
+      <span class="spancell on"></span><span class="spancell"></span><span class="spancell"></span>
+      <span class="spanval">1 credit</span></div>
+  </div>
+
+  <h3 style="font-size:14.5px;font-weight:640;margin:22px 0 4px">Why this affects you three times</h3>
+  <p><b>Your electives are 1 credit each.</b> That is why you pick two small courses rather than one big one —
+     each runs for two segments, roughly five weeks, not the whole term.</p>
+  <p><b>Your drop deadline depends on it.</b> A 1-credit course must be dropped within a week of its segment
+     starting. A 3-credit course gets two weeks. Miss it and you are in the course, fine or no fine.</p>
+  <p><b>A short course can become a long one later.</b> A 1-credit overview of a subject can be followed by a
+     deeper 2 or 3-credit version in a later semester. That is the whole point of the name: the same subject at
+     different scales.</p>
+
+  <div class="gotcha" style="margin-top:18px">
+    <div class="g">What it does not mean</div>
+    <p>It has nothing to do with difficulty, and nothing to do with which courses you are allowed to take. It is
+      only about length. A 1-credit course is shorter, not easier.</p>
+  </div>
+</div>
+
+<!-- SLOT GRID -->
+<div class="prose noprint" id="slots">
+  <h2>The slot grid</h2>
+  <p class="lede">Seven one-hour slots (A–G) and four ninety-minute slots (P–S). Every course sits in exactly one.
+     Two courses in the same letter always clash — that is the whole rule.</p>
+  <div style="overflow-x:auto">
+  <table class="dl" style="min-width:620px">
+    <thead><tr><th></th><th>09:00</th><th>10:00</th><th>11:00</th><th>12:00</th>
+      <th>12:55</th><th>14:30</th><th>16:00</th></tr></thead>
+    <tbody id="slotref"></tbody>
+  </table>
+  </div>
+  <p style="margin-top:14px"><b>No instructor will move a slot for one student.</b> The department says this outright,
+     so treat the grid as fixed. Wednesday afternoon is Challenge Lectures, which is why slot F is the odd one —
+     two mornings plus a Wednesday afternoon, where every other letter has three mornings.</p>
+</div>
+
+<!-- SENIORS -->
+<div class="prose noprint" id="seniors">
+  <h2>What your seniors took</h2>
+  <p class="lede">Engineering electives chosen by the 2024–26 and 2025–27 batches, from the department's own
+     orientation deck. Reference only — check the current outline and prerequisites before copying anyone.</p>
+  <div class="faults" id="seniorlist"></div>
+</div>
+
+<!-- DEADLINES -->
+<div class="prose noprint" id="dates">
+  <h2>Dates that matter</h2>
+  <p class="lede">Jul–Nov 2026 academic calendar. Drop windows depend on how many credits the course carries.</p>
+  <table class="dl">
+    <thead><tr><th>Segment</th><th>Classes start</th><th>Last date to add</th><th>Last date to drop</th></tr></thead>
+    <tbody>
+      <tr class="hot"><td class="mono">AIMS portal closes</td><td>—</td><td colspan="2"><b>31 July 2026, 23:59</b> — earlier than the calendar below. This is the one that locks.</td></tr>
+      <tr><td class="mono">1–2</td><td>27 Jul</td><td>3 Aug</td><td>3 Aug</td></tr>
+      <tr><td class="mono">1–3</td><td>27 Jul</td><td>3 Aug</td><td>5 Aug</td></tr>
+      <tr><td class="mono">1–4</td><td>27 Jul</td><td>3 Aug</td><td>10 Aug</td></tr>
+      <tr><td class="mono">1–6</td><td>27 Jul</td><td>3 Aug</td><td>10 Aug</td></tr>
+      <tr><td class="mono">3–4</td><td>31 Aug</td><td>7 Sep</td><td>7 Sep</td></tr>
+      <tr><td class="mono">3–6</td><td>31 Aug</td><td>7 Sep</td><td>14 Sep</td></tr>
+      <tr><td class="mono">4–6</td><td>17 Sep</td><td>23 Sep</td><td>28 Sep</td></tr>
+      <tr><td class="mono">5–6</td><td>6 Oct</td><td>12 Oct</td><td>12 Oct</td></tr>
+    </tbody>
+  </table>
+  <h3 style="font-size:14.5px;font-weight:640;margin:22px 0 6px">Things worth knowing</h3>
+  <p><b>No dropping after the add/drop period, even with a fine.</b> Every add and drop needs your Faculty Advisor's
+     approval, so leave time. A semester is six segments of about 2.5 to 3 weeks; one segment is half a credit, which
+     is why a 3-credit course spans segments 1–6 and a 1-credit course spans two.</p>
+  <p><b>Type conversion is one-time and irreversible</b>, capped at 3 credits. It changes an elective from one category
+     to another and you submit a form declaring the change. The department is explicit that it cannot be repeated.
+     Contact <code>office.acad@iith.ac.in</code>.</p>
+  <p><b>Grades run A+, A, A-, B, B-, C, C-, D</b> at 10, 10, 9, 8, 7, 6, 5 and 4 points, with F at zero. A+ and A both
+     carry 10. The Senate mandates no minimum attendance, but an instructor may put up to 10% of the marks on it.</p>
+</div>
+</main>
+
+<footer class="noprint">
+  <div class="wrap">
+    <div class="fgrid">
+      <div>
+        <a class="logo" href="#"><span class="logomark">EM</span> Course Planner</a>
+        <p class="blurb">An unofficial planning tool for M.Tech Techno-Entrepreneurship students at IIT Hyderabad.
+          Always confirm in AIMS before you submit.</p>
+      </div>
+      <div><h5>Plan</h5><a href="#how">Register in AIMS</a><a href="#calendar">Calendar</a>
+      <a href="#difficulty">Is it easy?</a>
+      <a href="#fractal">Fractal system</a>
+      <a href="#slots">Slot grid</a><a href="#dates">Dates</a></div>
+      <div><h5>Decide</h5><a href="#faults">AIMS friction</a><a href="#mistakes">8 ways to get it wrong</a>
+      <a href="#glossary">Glossary</a>
+      <a href="#seniors">Seniors' picks</a></div>
+      <div><h5>Contact</h5>
+        <a href="mailto:nakul@em.iith.ac.in">Dr. Nakul Parameswar · DPGC</a>
+        <a href="mailto:ranapratap@em.iith.ac.in">Dr. Ranapratap Maradana · FA</a>
+        <a href="mailto:office@em.iith.ac.in">EM department office</a>
+        <a href="mailto:office.acad@iith.ac.in">Academic Section</a>
+      </div>
+    </div>
+    <div class="fbot">
+      <span>Slots read from the 25 departmental timetables published for Jul–Nov 2026 and cross-checked against
+        live AIMS records. Curriculum from the department orientation deck.</span>
+      <span>Unofficial. Verify before you register.</span>
+    </div>
+  </div>
+</footer>
+
+<div id="pop" role="tooltip"></div>
+<div id="dbg"></div>
+<aside id="drawer" role="dialog" aria-modal="true" aria-label="Course details">
+  <div class="dhead">
+    <div><div class="dc" id="dcode"></div><div class="dt" id="dtitle"></div></div>
+    <button class="dclose" id="dclose" type="button" aria-label="Close">&times;</button>
+  </div>
+  <div id="dbody"></div>
+</aside>
+
+<script>
+
+/* ===== IITH slot grid — official, from iith.ac.in timetable template ===== */
+var DAYS=["Mon","Tue","Wed","Thu","Fri"];
+var ROWS=["09:00","10:00","11:00","12:00","14:30","16:00"];
+var ROWLBL={"09:00":"09:00–09:55","10:00":"10:00–10:55","11:00":"11:00–11:55",
+            "12:00":"12:00–12:55","14:30":"14:30–15:55","16:00":"16:00–17:25"};
+var SLOTS={
+  A:[[0,"09:00"],[2,"11:00"],[3,"10:00"]],
+  B:[[0,"10:00"],[2,"09:00"],[3,"11:00"]],
+  C:[[0,"11:00"],[2,"10:00"],[3,"09:00"]],
+  D:[[0,"12:00"],[1,"09:00"],[4,"11:00"]],
+  E:[[1,"10:00"],[3,"12:00"],[4,"09:00"]],
+  F:[[1,"11:00"],[4,"10:00"],[2,"14:30"]],
+  G:[[1,"12:00"],[2,"12:00"],[4,"12:00"]],
+  P:[[0,"14:30"],[3,"16:00"]],
+  Q:[[0,"16:00"],[3,"14:30"]],
+  R:[[1,"14:30"],[4,"16:00"]],
+  S:[[1,"16:00"],[4,"14:30"]]
+};
+
+/* ===== EM M.Tech Techno-Entrepreneurship curriculum =====
+   Source: em.iith.ac.in/mtech_program.html + live AIMS Jul–Nov 2026 data.
+   st: "ok" verified registerable in AIMS | "blocked" running but missing from picker
+       "off" not running this term | "noslot" registerable but no slot published    */
+var CUR={
+ 1:{ label:"Semester 1", total:14, note:"Plus the mandatory non-credit Clean India course, handled separately by NSS.", groups:[
+   {id:"core", name:"Core (EM)", need:9, rule:"All three are compulsory. 3 + 3 + 3.", courses:[
+     ["EM5090","Accounting and Finance for Entrepreneurs",3,"Q","Dr. Ranapratap Maradana","MAE-LH-6","ok"],
+     ["EM5110","Foundations of Techno-Entrepreneurship",3,"G","Dr. Jayshree Patnaik","MAE-LH-10","ok"],
+     ["EM5270","Entrepreneurial Marketing",3,"R","Dr. Rajesh Ittamalla","LHC-11","ok"]
+   ]},
+   {id:"mgmt", name:"Department electives", need:2, rule:"Pick any two. 1 + 1.", courses:[
+     ["EM5020","Innovation Management",1,"P","Dr. Nakul Parameswar","LHC-14","ok"],
+     ["EM5040","Game Theory for Startups",1,"E","Dr. L. M. Maiyar","MAE-LH-10","ok"],
+     ["EM5120","Economics for Technocrats",1,"","Dr. Ranapratap Maradana","\u2014","noslot"],
+     ["LA1260","Fundamentals of Organizational Structure",1,"","\u2014","\u2014","noslot"]
+   ]},
+   {id:"eng", name:"Engineering elective", need:3, rule:"One 3-credit course offered by another department. Course code must start with 5 or 6. Not Design, Physics, Chemistry or Maths.", eng:true, courses:[]}
+ ]},
+ 2:{ label:"Semester 2", total:14, note:"Industry Lecture and Communication Skills are both mandatory in this semester.", groups:[
+   {id:"core", name:"Core (EM)", need:7, rule:"All three are compulsory. 3 + 3 + 1.", courses:[
+     ["EM6040","Operational Entrepreneurship",3,"","\u2014","\u2014","next"],
+     ["EM6010","Strategic Management",3,"","\u2014","\u2014","next"],
+     ["EM6130","Introduction to Intellectual Property Rights",1,"","\u2014","\u2014","next"]
+   ]},
+   {id:"mgmt", name:"Department electives", need:2, rule:"Pick any two. 1 + 1.", courses:[
+     ["EM5130","HR and Leadership",1,"","\u2014","\u2014","next"],
+     ["EM5170","Design Thinking",1,"","\u2014","\u2014","next"],
+     ["EM5160","Marketing Research",1,"","\u2014","\u2014","next"],
+     ["EM5390","Start-up Financing",1,"","\u2014","\u2014","next"]
+   ]},
+   {id:"eng", name:"Engineering elective", need:3, rule:"Same rule as Semester 1.", eng:true, courses:[]},
+   {id:"mand", name:"Mandatory", need:2, rule:"Both are required, not a choice. 1 + 1.", courses:[
+     ["EM6096","Industry Lecture",1,"","\u2014","\u2014","next"],
+     ["LA5180","Communication Skills (Liberal Arts)",1,"","\u2014","\u2014","next"]
+   ]}
+ ]}
+};
+
+/* what students in the batches above actually took, from the department orientation deck.
+   Codes matched by title against the Jul-Nov 2026 catalogue where a match exists. */
+var SENIORS=[
+ ["Semester 1","2024-26",[["Deep Learning","AI5100","D"],["Advanced NLP","","audit only"],["Linear Optimization","",""],["Sustainability","SE5723","A"]]],
+ ["Semester 1","2025-27",[["Machine learning and its application","AI5000","C"],["Deep Learning","AI5100","D"],["Probability and Stochastic Process","AI5030","S"],["Concepts of Sustainability","SE5723","A"]]],
+ ["Semester 2","2024-26",[["Computer Vision","",""],["NLP","",""],["Fraud Analytics","",""],["Machine Learning for Mechanical Engineering","",""]]],
+ ["Semester 2","2025-27",[["E-Waste Recycling Methods","",""],["Image Analysis","",""],["Network Security","",""],["Instrumentation for efficient recycling and automation","",""]]]
+];
+
+var LATER=[["Semester 3","EM6085 Project Stage I — problem definition and business plan",12],
+           ["Semester 4","EM6095 Project Stage II — build a prototype or proof of concept",12]];
+
+/* ===== Engineering elective catalogue: 117 Level 5-6 courses, slots verified
+   against published departmental timetables for Jul-Nov 2026 =====
+   [code, slot, credits, title, department, aimsVerified3cr] */
+var ENG=[
+["AM5010","G","3.00","Fundamentals of Additive Manufacturing","Additive Manufacturing",1,0],
+["AI1000","D","","Theory","Artificial Intelligence",0,1],
+["AI2000","C","","of ML","Artificial Intelligence",0,1],
+["AI2200","Q","","Inequalities","Artificial Intelligence",0,1],
+["AI3000","S","","Learning","Artificial Intelligence",0,1],
+["AI3403","Q","","Systems","Artificial Intelligence",0,1],
+["AI4000","B","","","Artificial Intelligence",0,1],
+["AI4403","S","","in Finance","Artificial Intelligence",0,1],
+["AI5000","C","3.0","Foundations of Machine Learning","Artificial Intelligence",0,0],
+["AI5030","S","3.0","Probability and Stochastic Processes","Artificial Intelligence",0,0],
+["AI5040","R","","Game Theory and Mechanism Design","Artificial Intelligence",0,4],
+["AI5100","D","3.0","Deep Learning","Artificial Intelligence",0,0],
+["AI5110","F","3.0","Linear Algebra and Applications","Artificial Intelligence",0,0],
+["BM1000","C","2","Physio-Anatomy-I","Biomedical Engineering",0,1],
+["BM1060","F","3","Introduction to Programing and Elementory Data Structure","Biomedical Engineering",0,1],
+["BM2013","G","3","Analong and intigrated Circuits","Biomedical Engineering",0,1],
+["BM2053","C","2","Mathematical models & systems biology","Biomedical Engineering",0,1],
+["BM3000","G","3","Natural intelligence, Foundations of","Biomedical Engineering",0,1],
+["BM3040","B","2","Introduction to Biomechanics","Biomedical Engineering",0,1],
+["BM3900","E","3","Linear Systems and Signal","Biomedical Engineering",0,1],
+["BM4020","F","3","Biophotonics","Biomedical Engineering",0,1],
+["BM4080","S","2","Medical image processing & analysis","Biomedical Engineering",0,1],
+["BM4090","F","2","Biomaterials-1","Biomedical Engineering",0,1],
+["BM4135","Q","2","Biomechanical Design","Biomedical Engineering",0,1],
+["BM5013","Q","2","Sensors & transducers in healthcare","Biomedical Engineering",0,3],
+["BM5023","R","2","Biomedical Device","Biomedical Engineering",0,3],
+["BM5030","E","1","Scientific Computing","Biomedical Engineering",0,3],
+["BM5033","D","2","Statistical Inference Methods in Bioengineering","Biomedical Engineering",0,3],
+["BM5040","E","1","Biomechanics","Biomedical Engineering",0,3],
+["BM5070","C","2","Systems Physiology","Biomedical Engineering",0,3],
+["BM5090","F","1","Biomaterials: Materials in Medicine","Biomedical Engineering",0,3],
+["BM5110","B","1","Lab on Chip","Biomedical Engineering",0,3],
+["BM5190","G","2","Biofabrication","Biomedical Engineering",0,3],
+["BM5193","B","1","Product Design and Prototyping","Biomedical Engineering",0,3],
+["BT1020","C","","Bioinformatics","Biotechnology",0,1],
+["BT1110","G","","to Bio-Nanotechnology","Biotechnology",0,1],
+["BT2030","E","","","Biotechnology",0,1],
+["BT2040","B","","","Biotechnology",0,1],
+["BT2053","Q","","Data Biology and Biological Databases","Biotechnology",0,1],
+["BT3030","R","","Alignment Algorithms","Biotechnology",0,1],
+["BT3043","D","","Engineering","Biotechnology",0,1],
+["BT3050","S","","Transcriptomics, Proteomics","Biotechnology",0,1],
+["BT3123","P","","and R for Biologists","Biotechnology",0,1],
+["BT3203","B","","Learning in Bioinformatics","Biotechnology",0,1],
+["BT4010","R","","aided Drug Design","Biotechnology",0,1],
+["BT4026","B","","in Biotechnology and Bioinformatics","Biotechnology",0,1],
+["BT4030","C","","Biotechnology","Biotechnology",0,1],
+["BT4040","S","","and Immunotechnology","Biotechnology",0,1],
+["BT4150","A","","stability and human disease","Biotechnology",0,1],
+["BT4223","F","","for Molecular Dynamics simulation","Biotechnology",0,1],
+["BT5013","C","","Biochemistry","Biotechnology",0,4],
+["BT5060","Q","","Genome Organization and Gene Regulation","Biotechnology",0,4],
+["BT6040","G","","Bioindustry Lectures","Biotechnology",0,4],
+["BT6060","P","","Protein Misfolding in Neurodegenerative Diseases","Biotechnology",0,4],
+["BT6070","R","","Molecular mechanisms of aging and age-related disorders","Biotechnology",0,4],
+["BT6113","E","","Structural Bioinformatics","Biotechnology",0,4],
+["BT6143","F","","Gene Technology","Biotechnology",0,4],
+["BT6303","S","","Proteomics: Techniques and  Applications","Biotechnology",0,4],
+["BT6390","D","","Advanced Cell Biology","Biotechnology",0,4],
+["BT6630","A","","RNA Biology and Therapeutics","Biotechnology",0,4],
+["BT6873","B","","Host-Pathogen-Microbiota Interaction","Biotechnology",0,4],
+["CH1110","C","","to Chemical Engg","Chemical Engineering",0,1],
+["CH1120","E","","Chemistry","Chemical Engineering",0,1],
+["CH2110","A","","Engineering","Chemical Engineering",0,1],
+["CH2120","F","3","Nuerical Method","Chemical Engineering",0,1],
+["CH2130","P","","Phenomena","Chemical Engineering",0,1],
+["CH2140","C","","Engg Thermodynamics","Chemical Engineering",0,1],
+["CH2150","B","","Mathematics in Chemical Engineering","Chemical Engineering",0,1],
+["CH3110","A","","Transfer- I","Chemical Engineering",0,1],
+["CH3120","F","","Operations","Chemical Engineering",0,1],
+["CH3130","D","","Technology","Chemical Engineering",0,1],
+["CH3140","B","","Reaction Engineering - II","Chemical Engineering",0,1],
+["CH4112","B","","Design and Economics","Chemical Engineering",0,1],
+["CH5010","A","","Advanced Numerical Methods","Chemical Engineering",0,4],
+["CH5050","B","","Heterogeneous Catalytic Reaction Engineering","Chemical Engineering",0,4],
+["CH5060","G","","Advanced Process Control","Chemical Engineering",0,4],
+["CH5400","C","","Introduction to Colloids and Interface Science","Chemical Engineering",0,4],
+["CH5440","D","","Materials for Soft Robots","Chemical Engineering",0,4],
+["CH5460","D","","Process Integration","Chemical Engineering",0,4],
+["CH5480","C","","Advanced Colloids and Interfaces","Chemical Engineering",0,4],
+["CH5500","E","","Introduction to Polymer Rheology","Chemical Engineering",0,4],
+["CH5710","E","","Machine Learning Fundamentals","Chemical Engineering",0,4],
+["CH5720","P","","AI/ML Tool Chains for Chemical Engineers","Chemical Engineering",0,4],
+["CH5730","Q","","Computer Vision in Chemical and Life Sciences","Chemical Engineering",0,4],
+["CH5740","F","","DFT/AI for Catalyst Design","Chemical Engineering",0,4],
+["CH5750","C","","Accelerating MD with AI/ML","Chemical Engineering",0,4],
+["CH5860","P","","Computational Biology","Chemical Engineering",0,4],
+["CH5900","Q","","Computational Fluid Dynamics","Chemical Engineering",0,4],
+["CH5910","D","","Chemical Reactor Modeling","Chemical Engineering",0,4],
+["CH6080","E","","Introduction to Cardiovascular Mechanics","Chemical Engineering",0,4],
+["CH6580","E","","Advanced Mineral Processing","Chemical Engineering",0,4],
+["CH6620","F","","Intermolecular Forces","Chemical Engineering",0,4],
+["CH6870","P","","Machine learning for process systems engineering","Chemical Engineering",0,4],
+["CH6910","F","","Physicochemical Fundamentals for Chemical Engineers","Chemical Engineering",0,4],
+["CY1010","P","2","Environmental Chemistry","Chemistry",0,1],
+["CY5010","P","","Reaction Mechanism and Rearrangements","Chemistry",0,2],
+["CY5060","B","","solid-state chemistry and formulation tec","Chemistry",0,2],
+["CY5110","F","","in Inorganic Chemistry","Chemistry",0,2],
+["CY5210","R","","and Chemical Kinetics","Chemistry",0,2],
+["CY5220","S","","State Chemistry (+PhD)","Chemistry",0,2],
+["CY5240","Q","","Chemistry & Molecular Spectroscopy (+PhD)","Chemistry",0,2],
+["CY6010","A","","Methodology in Organic Chemistry (+PhD)","Chemistry",0,2],
+["CY6110","G","","in Biological Systems (+PhD)","Chemistry",0,2],
+["CY6120","G","","Organometallic Chemistry","Chemistry",0,2],
+["CY6220","C","","Methods in Chemistry (+PhD)","Chemistry",0,2],
+["CY6700","D","","& Applications (Elective) (+ PhD)","Chemistry",0,2],
+["CY6730","B","","Molecular Spectroscopy(+PhD)","Chemistry",0,2],
+["CY6750","E","","Storage Devices","Chemistry",0,2],
+["CY6903","P","","Modeling of Complex Chemical Systems(+PhD)","Chemistry",0,2],
+["CE2130","F","3","","Civil Engineering",0,1],
+["CE2420","E","3","Fluid Mechanics","Civil Engineering",0,1],
+["CE2510","C","3","","Civil Engineering",0,1],
+["CE2600","A","1","Sustainability in Civil","Civil Engineering",0,1],
+["CE2900","G","2","","Civil Engineering",0,1],
+["CE3212","B","3","Reinforced Concrete Design","Civil Engineering",0,1],
+["CE3242","D","3","Structural Steel Design","Civil Engineering",0,1],
+["CE3330","G","3","Foundation Engineering","Civil Engineering",0,1],
+["CE3400","A","2","Engineering Hydrology","Civil Engineering",0,1],
+["CE3820","E","2","Highway Design and Materials","Civil Engineering",0,1],
+["CE4400","D","2","Water Resource Engineering","Civil Engineering",0,1],
+["CE4830","C","1","","Civil Engineering",0,1],
+["CE5170","S","3","Mathematical Methods in Civil Engineering","Civil Engineering",0,0],
+["CE5190","Q","3","Advanced Concrete Technology","Civil Engineering",0,0],
+["CE5220","P","3.00","Solid Waste Management","Civil Engineering",1,0],
+["CE5290","P","3","Applied Elasticity and Plasticity","Civil Engineering",0,0],
+["CE5352","P","3","Design of Earth Structures","Civil Engineering",0,0],
+["CE5730","Q","3","Planning","Civil Engineering",0,0],
+["CE6243","R","3.00","Life Cycle Sustainability Analysis","Civil Engineering",1,0],
+["CE6500","R","3","Engineering Hydrology and Hydrologic Systems","Civil Engineering",0,0],
+["CE6520","Q","2","Irrigation Water Management","Civil Engineering",0,3],
+["CE6710","P","3","and ITS","Civil Engineering",0,0],
+["CE6720","G","3","Advanced Pavement Materials","Civil Engineering",0,0],
+["CC1010","A","1.0","Introduction to Climate Change","Climate Change",0,1],
+["CC5140","S","2.0","Climate governance","Climate Change",0,3],
+["CC5200","P","3.0","Remote Sensing, GIS & Climate Change","Climate Change",0,0],
+["CC5320","D","3.00","Introduction to Climate Science and Climate Monitoring","Climate Change",1,0],
+["CC5350","R","3.0","Translational Science for Collaborative Research","Climate Change",0,0],
+["CC5360","Q","3.0","Applied Mathematics and Scientific Computing for Climate Change","Climate Change",0,0],
+["CC5370","F","2.0","Essentials of Meteorology","Climate Change",0,3],
+["CC5380","F","1.0","Paleoclimatology: a peek into ancient climate change","Climate Change",0,3],
+["CS1000","E","1.0","Introduction to computing","Computer Science & Engineering",0,1],
+["CS1010","C","","Maths for Computer Science","Computer Science & Engineering",0,1],
+["CS2233","C","","Structures","Computer Science & Engineering",0,1],
+["CS2323","E","3.0","Computer Architecture","Computer Science & Engineering",0,1],
+["CS3390","R","","of Machine Learning","Computer Science & Engineering",0,1],
+["CS3423","B","","II","Computer Science & Engineering",0,1],
+["CS3510","Q","1.0","Operating Systems I","Computer Science & Engineering",0,1],
+["CS3530","A","","Networks","Computer Science & Engineering",0,1],
+["CS3550","R","","","Computer Science & Engineering",0,1],
+["CS5013","C","","GPU Programming","Computer Science & Engineering",0,4],
+["CS5060","P","","Advanced Computer Networks","Computer Science & Engineering",0,4],
+["CS5103","R","","Practical Malware Analysis","Computer Science & Engineering",0,4],
+["CS5280","F","3.0","Concurrency Control in Transactional Systems","Computer Science & Engineering",0,0],
+["CS5363","S","","Advanced Computer Architecture","Computer Science & Engineering",0,4],
+["CS5590","D","3","FoML","Computer Science & Engineering",0,0],
+["CS5600","F","","Data Mining","Computer Science & Engineering",0,4],
+["CS5610","E","","Computational Number Theory and Algebra","Computer Science & Engineering",0,4],
+["CS5663","Q","","AI for Databases","Computer Science & Engineering",0,4],
+["CS5903","S","","Distributed AI Training in a large-scale GPU cluster","Computer Science & Engineering",0,4],
+["CS6013","G","3.0","Advanced Data Structures and Algorithms","Computer Science & Engineering",0,0],
+["CS6113","P","","Representation Learning","Computer Science & Engineering",0,4],
+["CS6160","A","","Cryptology","Computer Science & Engineering",0,4],
+["CS6843","D","","C4ML: Compilers for Machine Learning","Computer Science & Engineering",0,4],
+["DS3813","R","3.0","Basics of Design","Design",0,1],
+["EE1010","P","","for Electrical Engineers","Electrical Engineering",0,1],
+["EE1030","D","3.0","Matrix Theory","Electrical Engineering",0,1],
+["EE1101","E","3.0","Circuits and Network Analysis","Electrical Engineering",0,1],
+["EE1202","C","3.0","Digital Circuits","Electrical Engineering",0,1],
+["EE1206","E","","Systems and Signal Processing","Electrical Engineering",0,1],
+["EE2000","C","","Processing","Electrical Engineering",0,1],
+["EE2080","D","","Processes","Electrical Engineering",0,1],
+["EE2100","D","","Theory","Electrical Engineering",0,1],
+["EE2104","E","","Device Fundamentals","Electrical Engineering",0,1],
+["EE2200","B","","Machines","Electrical Engineering",0,1],
+["EE2503","Q","","methods for device modeling","Electrical Engineering",0,1],
+["EE2510","Q","","tools for IC design","Electrical Engineering",0,1],
+["EE3004","E","","trends in EE","Electrical Engineering",0,1],
+["EE3140","E","","and Antennas","Electrical Engineering",0,1],
+["EE3150","C","","digital design","Electrical Engineering",0,1],
+["EE3300","A","","Circuits","Electrical Engineering",0,1],
+["EE3301","C","","VLSI Design","Electrical Engineering",0,1],
+["EE3501","Q","","Electronics","Electrical Engineering",0,1],
+["EE3502","B","","Design Tapeout","Electrical Engineering",0,1],
+["EE3510","F","","design and verification","Electrical Engineering",0,1],
+["EE3520","A","","IC Design","Electrical Engineering",0,1],
+["EE3700","P","","Systems","Electrical Engineering",0,1],
+["EE4500","S","","Systems","Electrical Engineering",0,1],
+["EE4502","F","","design test and characterization","Electrical Engineering",0,1],
+["EE5033","R","","IoT","Electrical Engineering",0,4],
+["EE5110","E","","Semiconductor Device and Modeling","Electrical Engineering",0,4],
+["EE5170","S","","Embedded Programming","Electrical Engineering",0,4],
+["EE5182","B","3.00","VLSI Technology","Electrical Engineering",1,0],
+["EE5183","A","","Analog IC Design","Electrical Engineering",0,4],
+["EE5193","C","","CMOS Digital Design","Electrical Engineering",0,4],
+["EE5200","G","","Steady State Power System Analysis","Electrical Engineering",0,4],
+["EE5210","C","","Power Converter Design","Electrical Engineering",0,4],
+["EE5230","P","","Power System Dynamics and Control","Electrical Engineering",0,4],
+["EE5240","Q","","Electric Machine Analysis and Control","Electrical Engineering",0,4],
+["EE5350","F","","Error Correcting Codes","Electrical Engineering",0,4],
+["EE5480","A","","Introduction to State Space","Electrical Engineering",0,4],
+["EE5490","A","","State Estimation","Electrical Engineering",0,4],
+["EE5540","R","","Optimal Control","Electrical Engineering",0,4],
+["EE5552","S","","Memory Design","Electrical Engineering",0,4],
+["EE5604","D","","Introduction to Statistical Learning Theory","Electrical Engineering",0,4],
+["EE5609","F","3.0","Matrix Theory","Electrical Engineering",0,0],
+["EE5610","C","","Pattern Recognition and Machine Learning","Electrical Engineering",0,4],
+["EE5630","D","","Topics in Signal Processing","Electrical Engineering",0,4],
+["EE5670","A","","High speed Semiconductor Optoelectronics","Electrical Engineering",0,4],
+["EE5750","Q","","Quantum Error Correction","Electrical Engineering",0,4],
+["EE5817","S","","Random Variables and Stochastic Processes","Electrical Engineering",0,4],
+["EE5837","D","3.00","Principles of Digital Communication","Electrical Engineering",1,0],
+["EE5848","P","","Topics in Information Theory and Coding","Electrical Engineering",0,4],
+["EE5900","B","","Advanced Digital Signal Processing","Electrical Engineering",0,4],
+["EE6190","R","","Introduction to Advanced Packaging","Electrical Engineering",0,4],
+["EE6307","C","","Speech Systems","Electrical Engineering",0,4],
+["EE6380","S","","Deep Learning","Electrical Engineering",0,4],
+["ET5010","B","2.0","Fundamentals of Electrochemistry","Energy Science & Technology",0,3],
+["ET5020","E","3.00","Electrochemical Energy Storage Systems: Batteries, Fuel Cells and Supe","Energy Science & Technology",1,0],
+["ET5030","R","2.0","Non-conventional energy sources and environment","Energy Science & Technology",0,3],
+["ET5060","A","2.0","Bio-energy","Energy Science & Technology",0,3],
+["EP1108","A","2","Modern Physics","Engineering Physics",0,1],
+["EP1118","D","2","Maths for Physics","Engineering Physics",0,1],
+["EM4040","Q","","Startup","Entrepreneurship & Management",0,1],
+["EM5010","Q","","Strategy for Startup","Entrepreneurship & Management",0,2],
+["EM5013","E","","Analytics","Entrepreneurship & Management",0,2],
+["EM5020","P","","Management","Entrepreneurship & Management",0,2],
+["EM5040","E","","Theory for Startups","Entrepreneurship & Management",0,2],
+["EM5050","P","","Modelling","Entrepreneurship & Management",0,2],
+["EM5090","Q","","and Finance for Entrepreneurs","Entrepreneurship & Management",0,2],
+["EM5110","G","","of Techno-entrepreneurship","Entrepreneurship & Management",0,2],
+["EM5180","C","","for Engineers","Entrepreneurship & Management",0,2],
+["EM5270","R","","Marketing","Entrepreneurship & Management",0,2],
+["EM6080","S","","for New Ventures","Entrepreneurship & Management",0,2],
+["EM6980","C","","Research Methodology","Entrepreneurship & Management",0,2],
+["IC1010","C","","Organic Chemistry-I","Integrated Circuits & Microsystems",0,1],
+["IC2010","E","","Organic Chemistry-II","Integrated Circuits & Microsystems",0,1],
+["IC2020","C","","to Biochemistry","Integrated Circuits & Microsystems",0,1],
+["IC2030","S","","","Integrated Circuits & Microsystems",0,1],
+["IC2060","Q","","and Petrochemicals","Integrated Circuits & Microsystems",0,1],
+["IC3010","B","","Science-I","Integrated Circuits & Microsystems",0,1],
+["IC3020","A","","Energy Conversion","Integrated Circuits & Microsystems",0,1],
+["IC3030","R","","Kinetics and Surface Chemistry","Integrated Circuits & Microsystems",0,1],
+["IC4010","D","","to Drug Design","Integrated Circuits & Microsystems",0,1],
+["IC4020","F","","Science-II","Integrated Circuits & Microsystems",0,1],
+["IC4030","C","","Science-II","Integrated Circuits & Microsystems",0,1],
+["ID1006","F","","for Engineering Education","Interdisciplinary",0,1],
+["ID1063","F","3.0","Introduction to Programming Theory","Interdisciplinary",0,1],
+["ID2230","A","","Structures & Applications","Interdisciplinary",0,1],
+["LA1760","G","","Skills","Liberal Arts",0,1],
+["LW5030","D","3.00","Fundamentals of Light Weight Alloys","Light Weight Materials",1,0],
+["MS1830","C","2.0","Fundamentals of Physical Metallurgy","Materials Science & Metallurgy",0,1],
+["MS1980","E","2.0","Fundamental of scientific computing","Materials Science & Metallurgy",0,1],
+["MS1990","C","1.0","Introduction to Material science and Engineering","Materials Science & Metallurgy",0,1],
+["MS2860","S","2.0","Computational Methods in Material Science","Materials Science & Metallurgy",0,1],
+["MS2970","P","3.0","Materials thermodynamics and kinetics","Materials Science & Metallurgy",0,1],
+["MA2110","D","1","Probability","Mathematics",0,1],
+["MA2120","D","1","Transforms Techniques","Mathematics",0,1],
+["MA2150","D","","to Metric Spaces","Mathematics",0,1],
+["MA2550","F","3.0","Linear Algebra","Mathematics",0,1],
+["MA3060","A","","Analysis","Mathematics",0,1],
+["AE3110","C","3","","Mechanical & Aerospace",0,1],
+["AE3120","P","3","","Mechanical & Aerospace",0,1],
+["AE5110","S","3","Aerodynamics and Propulsion","Mechanical & Aerospace",0,0],
+["AE5120","R","3","Flight Dynamics and Structures","Mechanical & Aerospace",0,0],
+["ME1060","C","3","","Mechanical & Aerospace",0,1],
+["ME2050","Q","2","","Mechanical & Aerospace",0,1],
+["ME3010","G","2","","Mechanical & Aerospace",0,1],
+["ME3030","S","3.0","Modelling and Simulation","Mechanical & Aerospace",0,1],
+["ME3040","B","1.5","","Mechanical & Aerospace",0,1],
+["ME3050","B","1.5","","Mechanical & Aerospace",0,1],
+["ME3140","D","3","","Mechanical & Aerospace",0,1],
+["ME3160","B","2","","Mechanical & Aerospace",0,1],
+["ME3170","A","3","","Mechanical & Aerospace",0,1],
+["ME3180","R","3.0","FEM and CFD Theory","Mechanical & Aerospace",0,1],
+["ME3210","A","3","","Mechanical & Aerospace",0,1],
+["ME3220","C","3","","Mechanical & Aerospace",0,1],
+["ME5010","F","3","Mathematical Methods for Engineers","Mechanical & Aerospace",0,0],
+["ME5020","C","1.5","","Mechanical & Aerospace",0,3],
+["ME5080","C","1.5","","Mechanical & Aerospace",0,3],
+["ME5110","P","3","Advanced Mechanics of Solids","Mechanical & Aerospace",0,0],
+["ME5120","D","3","Dynamics and Vibration","Mechanical & Aerospace",0,0],
+["ME5130","Q","3","Finite Element Method","Mechanical & Aerospace",0,0],
+["ME5210","B","3","CAD/CAM","Mechanical & Aerospace",0,0],
+["ME5310","Q","3","Incompressible Fluid Flow","Mechanical & Aerospace",0,0],
+["ME5320","E","3","Advanced Heat Transfer","Mechanical & Aerospace",0,0],
+["ME5330","P","3","Computational Fluid Dynamics","Mechanical & Aerospace",0,0],
+["ME5340","B","3","IC Engine Combustion and Pollution","Mechanical & Aerospace",0,0],
+["ME5480","S","3","Sustainable Energy Technology: Energy Sources, Efficiency, Storage and","Mechanical & Aerospace",0,0],
+["ME5770","C","3","Fundamentals of Robotics","Mechanical & Aerospace",0,0],
+["ME5780","D","3","Control Systems Design","Mechanical & Aerospace",0,0],
+["ME5880","A","3","","Mechanical & Aerospace",0,0],
+["ME5890","R","3","Advanced Refrigeration and Thermal Systems","Mechanical & Aerospace",0,0],
+["ME6040","E","3","Machine Learning and Its Applications","Mechanical & Aerospace",0,0],
+["SD5010","R","3.00","Fundamentals of Semiconductor Materials","Semiconductor Materials & Devices",1,0],
+["SD5113","C","3.00","Vacuum Technology in Semiconductor","Semiconductor Materials & Devices",1,0],
+["SM5033","S","2.0","Internet of Things (IoT)","Smart Mobility",0,3],
+["SE5500","F","","Green Chemistry and Industrial Processes","Sustainable Engineering",0,4],
+["SE5723","A","","Concepts in Sustainable Engineering","Sustainable Engineering",0,4]
+];
+/* index 6 — why it cannot be your engineering elective */
+var WHYTXT=["","Undergraduate or PhD level \u2014 yours must start with 5 or 6","This department is excluded for your engineering elective","Not a 3-credit course","Credits not published \u2014 confirm in AIMS"];
+
+
+/* ===== plain-language glossary — every term that stops a newcomer ===== */
+var GLOSS={
+ "slot":["Slot","A letter that fixes when a course meets. A–G are one-hour slots, P–S are ninety-minute ones. Every course sits in exactly one. Two courses in the same letter always clash, and no instructor will move one for you."],
+ "segment":["Segment","The semester is six blocks of about 2.5 to 3 weeks. A course’s segment code says which blocks it spans: 1–6 is the whole semester, 1–2 is just the first two blocks. It decides your drop deadline."],
+ "credit":["Credit","Roughly 14 teaching hours. A 3-credit course runs the full semester at about 42 hours; a 1-credit course is two segments. Semester 1 is 14 credits total."],
+ "elective type":["Elective type","The category you file a course under in the AIMS form. There are 14 options and no guidance. Choose wrong and your whole submission can be rejected, so this planner tells you which one to pick for each course."],
+ "core":["Core","Compulsory. You do not choose these, and you cannot swap them for something else."],
+ "fa":["Faculty Advisor (FA)","Dr. Ranapratap Maradana. He approves your registration and every add or drop after it. Nothing goes through without him, so leave time."],
+ "dpgc":["DPGC","Departmental Postgraduate Committee, convened by Dr. Nakul Parameswar. The person to email when a course is missing from AIMS or a rule is unclear."],
+ "type conversion":["Type conversion","A one-time, irreversible change of an elective from one category to another, capped at 3 credits. You submit a form. The department is explicit that it cannot be repeated."],
+ "audit":["Audit","Attend a course without the grade counting toward your CGPA. Shows as AU on the transcript. Needs the instructor’s permission."],
+ "backlog":["Backlog","A course you failed and are retaking. It goes in a separate section of the AIMS registration form, not the Regular one."],
+ "fractal":["Fractal system","IITH splits subjects into small modules, so a 1-credit overview of a topic can grow into a deeper 2 or 3-credit course later. It is why your electives are 1 credit each rather than one big block."],
+ "challenge lectures":["Challenge Lectures","Wednesday afternoon is reserved institute-wide for these. It is why slot F is the odd one — two mornings plus a Wednesday afternoon, where every other letter has three mornings."],
+ "clean india":["Clean India","A mandatory non-credit course run by NSS, handled outside AIMS course registration. Watch for a separate email; it does not appear in your registration form."],
+ "engineering elective":["Engineering elective","A 3-credit course from another department, chosen by you. Course code must start with 5 or 6. Design, Physics, Chemistry and Maths are excluded. Talk to your FA before choosing."],
+ "picker":["Course picker","The search popup inside the AIMS registration form. It only opens after you have chosen an elective type, and it shows 596 of the 786 courses actually running."],
+ "cgpa":["CGPA","Your running average across every course so far, weighted by credits. Grades run A+ and A at 10 points, then A- 9, B 8, B- 7, C 6, C- 5, D 4, and F at zero."]
+};
+
+var CODEPARTS=[
+ ["Letters","Department offering the course. EM is Entrepreneurship &amp; Management, ME is Mechanical, CS is Computer Science."],
+ ["1st digit","Level. 1–4 are undergraduate years, 5–6 are Masters, 7–8 are PhD. Your engineering elective must be 5 or 6."],
+ ["2nd digit","Nature. 0 theory, 1 lab, 2 design, 3 theory+lab, 4 design+tutorial, 5 project or thesis, 6 seminar."],
+ ["3rd–4th","Just an identifier. No meaning."]
+];
+
+var MISTAKES=[
+ ["Registering into the wrong semester","Three terms show as “Open” in AIMS at the same time — JUL26-NOV26, the 2026 summer term, and last year’s JUL25-NOV25. Nothing highlights the current one.","This planner only ever describes JUL26-NOV26, and the AIMS steps tell you exactly which row to click."],
+ ["Picking the wrong elective type","Fourteen options, no explanation, and the same course list under every one. The wrong choice can get your entire submission rejected after you have waited for approval.","Every course group here tells you the exact type to file it under, and the pre-flight script repeats it row by row."],
+ ["A timetable clash you find in week one","AIMS never shows a slot in the registration form. You can register two courses that meet at the same hour and only discover it when you are standing in the wrong corridor.","Clashes are flagged the moment they happen, and clashing options are hidden from the picker by default."],
+ ["Choosing a course that is not allowed","The engineering elective must be Level 5 or 6 and cannot come from Design, Physics, Chemistry or Maths. AIMS enforces none of this.","Every course is labelled with whether you can actually pick it, and anything you add by hand is checked against both rules."],
+ ["Assuming a course exists because it is on the curriculum sheet","The AIMS picker shows 596 of the 786 courses running this term. A course can be printed on your curriculum sheet, timetabled by the department, and still return \u201cNo records found\u201d when you search for it.","Anything known to be missing is labelled here. If a code returns nothing in AIMS, that is the department\u2019s to fix \u2014 email the DPGC the same day."],
+ ["Missing the real deadline","The department email says 3 August. Every course record in AIMS says registration closes 31 July at 23:59. If you trust the email you lose three days you never had.","The earlier date is the one shown everywhere, and it goes into your calendar with a reminder."],
+ ["Thinking you are done when you press Register","Your Faculty Advisor still has to approve it, and a rejection appears in a collapsed list at the bottom of the page that is easy to never look at.","The pre-flight checklist ends with going back to check, not with pressing the button."],
+ ["Forgetting the non-credit course","Clean India is mandatory, is run by NSS, and never appears in course registration. Students who only work from the AIMS form miss it entirely.","It is on the checklist."]
+];
+
+
+/* ===== what each course actually teaches =====
+   Every entry was read from a published IITH source. Nothing is inferred from a
+   course title. [summary, sourceLabel, sourceURL, prerequisiteOrNull] */
+var DESC={
+"AI5040":["Non-cooperative game theory (strategic and extensive form games, Nash equilibrium, bargaining), cooperative game theory (the core, Shapley value, nucleolus), mechanism design (Arrow's impossibility, VCG mechanisms, Myerson auctions), and applications to fair division, routing games and sponsored search auctions.","Instructor course site","https://sites.google.com/ai.iith.ac.in/ai5040-gtmd/home",null],
+"AI5100":["Deep feedforward networks, regularisation and optimisation for deep models, convolutional and recurrent networks, practical methodology, then advanced topics including GANs and variational autoencoders. Recent instructor pages add attention and Transformers, diffusion models and CLIP.","Institute Courses of Study","https://www.iith.ac.in/assets/files/pdf/Courses-of-Study-Bachelors.pdf",null],
+"AI5000":["Published under its older title “Basics of Machine Learning”: classification and regression with linear and nonlinear models, Bayes decision theory, risk minimisation, multilayer perceptrons and support vector machines, unsupervised learning, Bayesian networks and graphical models, exact and approximate inference, parameter estimation.","Institute Courses of Study","https://www.iith.ac.in/assets/files/pdf/Courses-of-Study-Bachelors.pdf",null],
+"ME5480":["Thermodynamics review; energy demand and supply outlook; climate projections and risk; non-renewables and their environmental impact; renewables (wind, solar PV and thermal, geothermal, hydro); carbon-neutral fuels (biomass, hydrogen, CO2-to-fuel, fuel cells); energy storage (battery, electro-mechanical, thermal); efficiency and emissions (exergy optimisation, carbon capture, energy-efficient buildings, life-cycle assessment, smart grids).","MAE Courses Syllabus Manual","https://mae.iith.ac.in/files/mae_pg.pdf",null],
+"ME5010":["Vectors and tensors, ordinary and partial differential equations, Fourier analysis, linear algebra including eigenvalues, orthogonalisation and SVD, integral equations, and the calculus of variations.","MAE Courses Syllabus Manual","https://mae.iith.ac.in/files/mae_pg.pdf","GATE-level mathematics"],
+"ME5120":["Analytical dynamics, degrees of freedom, equations of motion via Newton's laws and Lagrange's equations, constrained motion, damped and undamped single- and multi-degree-of-freedom systems, vibration isolation, and vibration of continuous systems.","MAE Courses Syllabus Manual","https://mae.iith.ac.in/files/mae_pg.pdf",null],
+"ME5780":["System modelling and block diagrams, performance specifications and stability, PID and lead-lag controller design, root locus, state-space modelling, and state-space observers and controllers.","IITH CCE course page","https://cce.iith.ac.in/live_stream/jul-nov-2026/Control%20Systems%20Design.html","None stated"],
+"EE5182":["Crystal growth and defects, wafer cleaning and wet etching, diffusion and ion implantation, oxidation kinetics and high-k dielectrics, lithography, chemical vapour deposition and epitaxy, metallisation and interconnects, plasma and rapid thermal processing, and process integration for NMOS, CMOS and bipolar.","EE department course page","https://ee.iith.ac.in/Courses/EE5182.html",null],
+"EE5837":["Digital sources and quantisation, waveform channels and baseband transmission, signal-space representation, Gaussian noise, modulation and demodulation with receiver performance for BPSK, QAM and FSK, channel capacity, channel coding with convolutional and LDPC codes, and fading in wireless channels.","EE department course page","https://ee.iith.ac.in/Courses/EE5837.html",null],
+"EE5610":["Parameter estimation, overfitting and model selection, the curse of dimensionality and bias-variance tradeoff, density estimation and Bayes decision theory, generative versus discriminative models, linear and logistic regression, K-means and vector quantisation, Gaussian mixtures, autoencoders, dimensionality reduction, hidden Markov models and linear dynamical systems.","EE department course page","https://ee.iith.ac.in/Courses/EE5610.html",null],
+"CS5600":["Recommendation systems, information extraction, frequent pattern mining, finding similar items with LSH, stream mining, social network analysis, opinion mining, large-scale file systems and MapReduce, mining time series and discrete sequences, clustering, anomaly detection and mining web data.","CSE department elective sheet","https://cse.iith.ac.in/academics/courses.html",null],
+"CS6013":["Divide and conquer including Strassen and FFT, greedy algorithms with minimum spanning trees and union-find, dynamic programming, probabilistic data structures, red-black and B-trees, heaps and amortised analysis, graph algorithms, NP-hardness, approximation and randomised algorithms.","Instructor course pages","https://people.iith.ac.in/aravind/cs6013.html",null],
+"CE6500":["Governing equations for hydrologic processes; occurrence, distribution, measurement and interpretation of precipitation, abstractions, run-off, stream flow and groundwater; distributed and lumped hydrologic analysis; hydrologic statistics; and analysis of extreme events.","Institute Courses of Study, Masters and PhD","https://www.iith.ac.in/assets/files/pdf/Courses-of-Study-Masters-PhD.pdf",null],
+"CE5170":["Vector and matrix operations and norms, tensor theory, Laplace transforms, Fourier series and transforms, first- and second-order ODEs with initial and boundary value problems, PDE classification and analytical solutions, numerical integration and differentiation, root-finding, curve fitting, and linear systems by Gaussian elimination, Gauss-Seidel, LU, eigenvalue analysis, SVD and least squares.","IITH CCE course page","https://cce.iith.ac.in/live_stream/july-nov-2025/Mathematical-Methods-in-Civil-Engineering.html","Basics of linear algebra"],
+"CH5010":["Review of computer programming; solving simultaneous linear and nonlinear equations; Newton's interpolation; quadrature; systems of first-order ODEs and stability analysis; variable step-size algorithms; finite difference methods for ODEs and for hyperbolic, parabolic and elliptic PDEs; and numerical solutions to chemical engineering problems in separation, reaction engineering, fluid mechanics, process control and thermodynamics.","ChE department course list","https://che.iith.ac.in/courseb-list-22-07-2024.html",null],
+"BT6390":["Introduction to cell biology, plasma membrane biogenesis and function, the cytoskeleton, mitosis and meiosis, mitochondrial biogenesis, protein import, ER and Golgi biosynthesis, vesicular trafficking, lysosome biogenesis and pathophysiology, the nuclear envelope and nuclear transport, the cell cycle and cell death, and regulation of signalling pathways.","Biotechnology department course descriptions","https://sites.google.com/iith.ac.in/department-of-biotechnology/academics/courses",null],
+"SE5723":["Sustainability and its social, environmental and economic components; sustainability concepts through life-cycle assessment, resource allocation, the materials cycle, energy balance, impact and risk analysis and environmental cost analysis; sustainable routes including waste management, pollution abatement and resource recovery; the UN Sustainable Development Goals; plus lab sessions on LCA and resource-flow software and circular economy.","Greenko School SE curriculum","https://gss.iith.ac.in/Program.html",null],
+"ME5110":["Published in the MAE syllabus manual alongside the other Mechanical PG courses.","MAE Courses Syllabus Manual","https://mae.iith.ac.in/files/mae_pg.pdf",null],
+"ME5130":["Published in the MAE syllabus manual alongside the other Mechanical PG courses.","MAE Courses Syllabus Manual","https://mae.iith.ac.in/files/mae_pg.pdf",null],
+"ME5210":["Published in the MAE syllabus manual alongside the other Mechanical PG courses.","MAE Courses Syllabus Manual","https://mae.iith.ac.in/files/mae_pg.pdf",null],
+"ME5310":["Published in the MAE syllabus manual alongside the other Mechanical PG courses.","MAE Courses Syllabus Manual","https://mae.iith.ac.in/files/mae_pg.pdf",null],
+"ME5320":["Published in the MAE syllabus manual alongside the other Mechanical PG courses.","MAE Courses Syllabus Manual","https://mae.iith.ac.in/files/mae_pg.pdf",null],
+"ME5330":["Published in the MAE syllabus manual alongside the other Mechanical PG courses.","MAE Courses Syllabus Manual","https://mae.iith.ac.in/files/mae_pg.pdf",null],
+"ME5340":["Published in the MAE syllabus manual alongside the other Mechanical PG courses.","MAE Courses Syllabus Manual","https://mae.iith.ac.in/files/mae_pg.pdf",null],
+"ME6040":["Published in the MAE syllabus manual alongside the other Mechanical PG courses.","MAE Courses Syllabus Manual","https://mae.iith.ac.in/files/mae_pg.pdf",null]
+};
+
+/* codes whose published title disagrees between the 2026 departmental timetable and an
+   older institute catalogue. IITH reuses codes, so both may have been right at some point. */
+var TITLECONFLICT={
+"AI5110":"The Jul–Nov 2026 AI timetable prints this as “Linear Algebra and Applications”. The institute Courses of Study prints AI5110 as “Big Data – Tools and Techniques”, 2 credits. Confirm which one is running before you register.",
+"BT5013":"The Jul–Nov 2026 Biotechnology timetable prints this code. The department's own course document lists Biochemistry as BT5010. Confirm the code in AIMS.",
+"ME5880":"The MAE syllabus manual calls this “Combustion and Flow Diagnostics”; the current MAE stream page calls it “Probability and Optimization”. No title is shown here until the department confirms.",
+"SE5723":"Published in the Greenko School curriculum as SE50723. Confirm the exact code in AIMS.",
+"ET5020":"The Energy Science M.Tech lists “Electrochemical energy storage systems” as a core course, but no IITH page publishes the code ET5020. Confirm before registering."
+};
+
+</script>
+<script>
+(function(){
+"use strict";
+
+/* ---------------- state ---------------- */
+var state = { sem:1, picked:{}, eng:null };   // picked: {code:true} for curriculum courses
+var POOL = [];                                 // engineering catalogue rows (+ user additions)
+ENG.forEach(function(r){
+  POOL.push({code:r[0], slot:r[1], cr:r[2], title:r[3]||"Title not confirmed — check AIMS", dept:r[4], v:r[5], why:r[6]||0, custom:0, notitle:!r[3]});
+});
+
+var $ = function(id){ return document.getElementById(id); };
+function el(tag, cls, txt){ var e=document.createElement(tag); if(cls)e.className=cls; if(txt!=null)e.textContent=txt; return e; }
+function poolGet(code){ for(var i=0;i<POOL.length;i++){ if(POOL[i].code===code) return POOL[i]; } return null; }
+
+/* ---------------- selection model ---------------- */
+// returns [{code,title,cr,slot,grp,st}]
+function selected(){
+  var out=[], cur=CUR[state.sem];
+  cur.groups.forEach(function(g){
+    if(g.eng) return;
+    g.courses.forEach(function(c){
+      if(state.picked[c[0]]) out.push({code:c[0],title:c[1],cr:c[2],slot:c[3],grp:g.id,st:c[6]});
+    });
+  });
+  if(state.eng){
+    var p = poolGet(state.eng);
+    if(p) out.push({code:p.code,title:p.title,cr:parseFloat(p.cr)||0,slot:p.slot,grp:"eng",st:p.custom?"custom":"ok"});
+  }
+  return out;
+}
+function occupancy(exclude){
+  var m={};
+  selected().forEach(function(c){
+    if(!c.slot || c.code===exclude) return;
+    (m[c.slot] = m[c.slot] || []).push(c);
+  });
+  return m;
+}
+function groupCredits(gid){
+  var n=0;
+  selected().forEach(function(c){ if(c.grp===gid) n += (parseFloat(c.cr)||0); });
+  return n;
+}
+function isAdvisory(gid){
+  var g = CUR[state.sem].groups.filter(function(x){ return x.id===gid; })[0];
+  return !!(g && g.advisory);
+}
+function totalCredits(){
+  var n=0;
+  selected().forEach(function(c){ if(!isAdvisory(c.grp)) n += (parseFloat(c.cr)||0); });
+  return n;
+}
+
+/* ---------------- render: course groups ---------------- */
+var TYPEHINT = { core:"Departmental Core Theory", mgmt:"Departmental Elective",
+                 eng:"Free Elective", mand:"Departmental Core Theory / Liberal Arts Elective" };
+
+/* ---- static reference tables ---- */
+(function slotRef(){
+  var host=document.getElementById("slotref"); if(!host) return;
+  var COLS=["09:00","10:00","11:00","12:00","LUNCH","14:30","16:00"];
+  var at={};
+  Object.keys(SLOTS).forEach(function(L){
+    SLOTS[L].forEach(function(p){ at[p[0]+"|"+p[1]] = L; });
+  });
+  DAYS.forEach(function(day,di){
+    var tr=document.createElement("tr");
+    var th=document.createElement("td"); th.innerHTML="<b>"+day+"</b>"; tr.appendChild(th);
+    COLS.forEach(function(t){
+      var td=document.createElement("td");
+      if(t==="LUNCH"){ td.innerHTML='<span style="color:#A9AEB5;font-size:11px">lunch</span>'; }
+      else {
+        var L=at[di+"|"+t];
+        if(L) td.innerHTML='<b class="mono" style="color:#1E3A5F">'+L+'</b>';
+        else if(di===2 && (t==="14:30"||t==="16:00")) td.innerHTML='<span style="color:#A9AEB5;font-size:11px">challenge<br>lectures</span>';
+        else td.innerHTML='<span style="color:#D5D2CB">&middot;</span>';
+      }
+      tr.appendChild(td);
+    });
+    host.appendChild(tr);
+  });
+})();
+(function seniors(){
+  var host=document.getElementById("seniorlist"); if(!host || typeof SENIORS==="undefined") return;
+  SENIORS.forEach(function(b){
+    var d=document.createElement("div"); d.className="fault";
+    var h='<div class="n">'+b[0]+' &middot; batch '+b[1]+'</div>';
+    h+='<div style="font-size:13px;line-height:1.9">';
+    b[2].forEach(function(c){
+      h += '&bull; '+c[0];
+      if(c[1]) h += ' <b class="mono" style="color:#0F766E">'+c[1]+'</b> <span style="color:#7C838C">slot '+c[2]+'</span>';
+      else if(c[2]) h += ' <span style="color:#7C838C">('+c[2]+')</span>';
+      else h += ' <span style="color:#B0B5BC">— no code given</span>';
+      h += '<br>';
+    });
+    h+='</div>';
+    d.innerHTML=h; host.appendChild(d);
+  });
+})();
+
+function renderGroups(){
+  var host = $("groups"); host.innerHTML="";
+  var cur = CUR[state.sem];
+  cur.groups.forEach(function(g){
+    var wrap = el("div","grp");
+    var head = el("div","ghead");
+    head.appendChild(el("span","gname", g.name));
+    if(g.advisory){
+      head.appendChild(el("span","gtally todo","verify"));
+    } else {
+      var got = groupCredits(g.id);
+      head.appendChild(el("span","gtally " + (got===g.need ? "done" : got>g.need ? "over" : "todo"),
+                          got + " / " + g.need + " cr"));
+    }
+    wrap.appendChild(head);
+
+    var rule = el("div","grule");
+    rule.innerHTML = g.rule + ' <span style="color:#A9AEB5">&middot; register under <b style="color:#4A4E55">'
+                   + TYPEHINT[g.id] + '</b></span>';
+    wrap.appendChild(rule);
+
+    if(g.eng){
+      var cho = el("div","grule");
+      cho.style.paddingTop = "0";
+      var p = state.eng ? poolGet(state.eng) : null;
+      if(p){
+        cho.innerHTML = '<b style="color:#0F766E">'+p.code+'</b> &mdash; '+esc(p.title)+
+                        ' &middot; slot <b class="mono">'+(p.slot||"none")+'</b>';
+      } else {
+        cho.innerHTML = '<i style="color:#A9AEB5">Nothing chosen yet &mdash; use the picker below.</i>';
+      }
+      wrap.appendChild(cho);
+      host.appendChild(wrap);
+      return;
+    }
+
+    var occ = occupancy();
+    g.courses.forEach(function(c){
+      var code=c[0], title=c[1], cr=c[2], slot=c[3], coord=c[4], room=c[5], st=c[6];
+      var disabled = (st==="off");
+      var lab = el("label","crs" + (disabled?" dis":""));
+      var cb = el("input"); cb.type="checkbox"; cb.checked = !!state.picked[code]; cb.disabled = disabled;
+      cb.addEventListener("change", function(){
+        if(cb.checked) state.picked[code]=true; else delete state.picked[code];
+        sync();
+      });
+      lab.appendChild(cb);
+
+      var main = el("div","cmain");
+      main.appendChild(el("div","ccode mono", code));
+      main.appendChild(el("div","ctitle", title));
+      var meta = coord && coord!=="—" ? coord + (room && room!=="—" ? " · " + room : "") : "";
+      if(meta) main.appendChild(el("div","cmeta", meta));
+      lab.appendChild(main);
+
+      var right = el("div","cright");
+      var sb = el("span","slotbadge" + (slot?"":" none"), slot ? slot : "no slot");
+      right.appendChild(sb);
+      right.appendChild(el("span","cr", cr + " cr"));
+      if(st==="blocked") right.appendChild(el("span","flag blocked","not in picker"));
+      else if(st==="off") right.appendChild(el("span","flag off","not running"));
+      else if(st==="noslot") right.appendChild(el("span","flag noslot","slot tba"));
+      else if(st==="next") right.appendChild(el("span","flag next","next term"));
+      if(slot && occ[slot] && occ[slot].length>1 && state.picked[code])
+        right.appendChild(el("span","flag clash","clash"));
+      var ib=el("button","einfo","i"); ib.type="button";
+      ib.setAttribute("aria-label","Details for "+code);
+      ib.addEventListener("click",function(ev){
+        ev.preventDefault(); ev.stopPropagation();
+        openDetail({code:code,title:title,cr:cr,slot:slot,
+                    coord:(coord&&coord!=="\u2014"?coord:""), room:(room&&room!=="\u2014"?room:""),
+                    st:st, grp:g.id});
+      });
+      right.appendChild(ib);
+      lab.appendChild(right);
+      wrap.appendChild(lab);
+    });
+    host.appendChild(wrap);
+  });
+}
+
+/* ---------------- render: engineering picker ---------------- */
+function fillDepts(){
+  var s=$("edept"); if(!s || s.options.length>1) return;
+  var seen={}; POOL.forEach(function(p){ if(p.dept) seen[p.dept]=1; });
+  Object.keys(seen).sort().forEach(function(d){
+    var o=document.createElement("option"); o.value=d; o.textContent=d; s.appendChild(o);
+  });
+}
+function renderElist(){
+  fillDepts();
+  var host = $("elist"); host.innerHTML="";
+  var q = ($("esearch").value||"").trim().toLowerCase();
+  var hide = $("onlyfree").checked;
+  var dept = $("edept") ? $("edept").value : "";
+  var occ = occupancy(state.eng);
+  var shown=0, hidden=0, inelig=0;
+
+  POOL.forEach(function(p){
+    var clash = p.slot && occ[p.slot] && occ[p.slot].length>0;
+    if(q && (p.code+" "+p.title+" "+p.dept).toLowerCase().indexOf(q)<0) return;
+    if(dept && p.dept!==dept) return;
+    var hasDoc = (typeof DESC!=="undefined") && !!DESC[p.code];
+    var okPick = !p.why || p.why===4;
+    if($("onlyok") && $("onlyok").checked && !okPick){ inelig++; return; }
+    if($("onlydoc") && $("onlydoc").checked && !hasDoc) return;
+    if(hide && clash && state.eng!==p.code){ hidden++; return; }
+    shown++;
+    var row = el("div","erow" + (state.eng===p.code?" sel":"") + (clash?" clash":"") + (p.notitle?" untitled":""));
+    row.appendChild(el("span","vdot"+(p.v?"":" un")));
+    row.appendChild(el("span","ecode mono", p.code));
+    row.appendChild(el("span","etitle", p.title));
+    row.appendChild(el("span","edept", p.dept));
+    row.appendChild(el("span","slotbadge"+(p.slot?"":" none"), p.slot||"\u2014"));
+    row.appendChild(el("span","cr", p.cr ? p.cr+" cr" : "cr ?"));
+    if(clash) row.appendChild(el("span","flag clash","clash"));
+    if(p.why && p.why!==4) row.appendChild(el("span","flag off","can\u2019t pick"));
+    else if(p.why===4) row.appendChild(el("span","flag noslot","cr ?"));
+    var ib=el("button","einfo"+(hasDoc?" hasdoc":""),"i"); ib.type="button";
+    ib.setAttribute("aria-label","Details for "+p.code+(hasDoc?" (syllabus published)":""));
+    ib.addEventListener("click",function(ev){ ev.stopPropagation(); openDetail(p); });
+    row.appendChild(ib);
+    row.addEventListener("click", function(){ state.eng=(state.eng===p.code)?null:p.code; sync(); });
+    host.appendChild(row);
+  });
+
+  if(!shown){
+    var x = el("div","erow"); x.style.color="var(--ink3)";
+    x.textContent = hidden ? "Everything matching clashes with a course you have already picked. Untick \u201cHide clashes\u201d to see them anyway."
+                           : "Nothing matches that search.";
+    host.appendChild(x);
+  }
+  $("ecount").textContent = shown + " of " + POOL.length + " courses shown" +
+    (inelig ? ", " + inelig + " hidden because you cannot use them as your engineering elective" : "") +
+    (hidden ? ", " + hidden + " hidden because they clash" : "") +
+    " \u00b7 a filled \u24d8 means IITH publishes a syllabus";
+}
+
+/* ---------------- render: week grid ---------------- */
+function renderWeek(){
+  var body = $("wkbody"); body.innerHTML="";
+  var cells={};
+  ROWS.forEach(function(t){
+    var tr=el("tr");
+    var th=el("th","mono", ROWLBL[t]); tr.appendChild(th);
+    for(var d=0; d<5; d++){
+      var td=el("td","c free");
+      cells[d+"|"+t]=td; tr.appendChild(td);
+    }
+    body.appendChild(tr);
+  });
+  Object.keys(SLOTS).forEach(function(L){
+    SLOTS[L].forEach(function(p){
+      var td=cells[p[0]+"|"+p[1]]; if(!td) return;
+      td.appendChild(el("span","sl mono", L));
+      td.dataset.slot = L;
+    });
+  });
+
+  var occ = occupancy();
+  Object.keys(occ).forEach(function(L){
+    if(!SLOTS[L]) return;
+    var list = occ[L], bad = list.length>1;
+    SLOTS[L].forEach(function(p){
+      var td=cells[p[0]+"|"+p[1]]; if(!td) return;
+      td.className="c";
+      var b = el("div","bk " + (bad ? "bad" : list[0].grp));
+      b.appendChild(el("div","a mono", list.map(function(c){return c.code;}).join(" / ")));
+      b.appendChild(el("div","b", bad ? "two courses, same slot" : list[0].title.slice(0,30)));
+      td.appendChild(b);
+    });
+  });
+}
+
+/* ---------------- render: status ---------------- */
+function renderStatus(){
+  var host=$("status"); host.innerHTML="";
+  var cur=CUR[state.sem], sel=selected(), occ=occupancy(), msgs=[];
+
+  var clashSlots = Object.keys(occ).filter(function(L){ return occ[L].length>1; });
+  clashSlots.forEach(function(L){
+    msgs.push({k:"bad", h:"Slot " + L + " clash",
+      p:[occ[L].map(function(c){return c.code+" ("+c.title+")";}).join(" and ") +
+         " are both in slot " + L + ", which meets " + slotHuman(L) + ".",
+         "No instructor will move a slot for one student. Drop one of them."]});
+  });
+
+  sel.forEach(function(c){
+    if(c.st==="blocked") msgs.push({k:"bad", h:c.code+" is not registerable right now",
+      p:["It is timetabled and its registration window is open, but it does not appear in the AIMS course picker under any elective type. Email the department the same day you notice it."]});
+    if(c.st==="noslot") msgs.push({k:"warn", h:c.code+" has no published slot",
+      p:["A clash cannot be ruled out for this one. Confirm the timings with the department before you count on it."]});
+    if(c.st==="custom"){
+      var lvl=c.code[2], pre=c.code.slice(0,2), probs=[];
+      if(!(lvl>="5"&&lvl<="6"))
+        probs.push("Its level digit is "+lvl+". The engineering elective must be Level 5 or 6 — a Level "+lvl+" course will not count.");
+      if(["DS","PH","CY","MA","EP","MP"].indexOf(pre)>=0)
+        probs.push("The "+pre+" prefix is Design, Physics, Chemistry or Maths. Your department excludes all of those.");
+      if(c.grp==="eng" && parseFloat(c.cr||0)!==3)
+        probs.push("It is entered as "+(c.cr||"no")+" credits. The engineering elective must be exactly 3.");
+      if(probs.length) msgs.push({k:"bad", h:c.code+" does not meet the rules", p:probs});
+      else msgs.push({k:"warn", h:c.code+" was added by hand",
+        p:["Level and department look right, but nothing here has been checked against AIMS. Confirm it is actually registerable and that your FA agrees before you rely on it."]});
+    }
+  });
+
+  cur.groups.forEach(function(g){
+    if(g.advisory) return;
+    var got=groupCredits(g.id);
+    if(got>g.need) msgs.push({k:"warn", h:"Too many credits in " + g.name.toLowerCase(),
+      p:[got+" credits selected where the curriculum asks for "+g.need+". Anything extra normally has to be registered as Additional, which is a separate approval."]});
+  });
+
+  var tot=totalCredits();
+  if(tot===cur.total && !clashSlots.length && !sel.some(function(c){return c.st==="blocked";})){
+    msgs.unshift({k:"good", h:"This is a valid semester",
+      p:[cur.total+" credits, no clashes, everything registerable. Print it or copy the link before you go into AIMS."]});
+  }
+
+  if(!sel.length){
+    host.appendChild(mk({k:"warn", h:"Nothing selected yet",
+      p:["Tick your courses on the left. Requirements and clashes update as you go."]}));
+    return;
+  }
+  msgs.slice(0,6).forEach(function(m){ host.appendChild(mk(m)); });
+
+  function mk(m){
+    var d=el("div","stat "+m.k);
+    d.appendChild(el("h3",null,m.h));
+    m.p.forEach(function(t){ d.appendChild(el("p",null,t)); });
+    return d;
+  }
+}
+function slotHuman(L){
+  if(!SLOTS[L]) return "an unlisted time";
+  return SLOTS[L].map(function(p){ return DAYS[p[0]]+" "+ROWLBL[p[1]]; }).join(", ");
+}
+
+/* ---------------- print list + exports ---------------- */
+function renderPrint(){
+  var host=$("printlist"); host.innerHTML="";
+  var t=el("table"), sel=selected();
+  sel.forEach(function(c){
+    var tr=el("tr");
+    tr.appendChild(el("td","mono", c.code));
+    tr.appendChild(el("td",null,c.title));
+    tr.appendChild(el("td","mono", c.slot ? "Slot "+c.slot : "—"));
+    tr.appendChild(el("td","mono", c.cr+" cr"));
+    t.appendChild(tr);
+  });
+  host.appendChild(t);
+}
+function asText(){
+  var cur=CUR[state.sem], sel=selected();
+  var L=["IITH M.Tech Techno-Entrepreneurship — "+cur.label,"Jul–Nov 2026",""];
+  sel.forEach(function(c){
+    L.push(c.code+"  "+c.title+"  ["+(c.slot?"Slot "+c.slot:"no slot")+"]  "+c.cr+" cr");
+    if(c.slot && SLOTS[c.slot]) L.push("      "+slotHuman(c.slot));
+  });
+  L.push("", "Total: "+totalCredits()+" / "+cur.total+" credits");
+  var occ=occupancy(), cl=Object.keys(occ).filter(function(k){return occ[k].length>1;});
+  if(cl.length) L.push("WARNING — clash in slot "+cl.join(", "));
+  L.push("", "AIMS registration closes 31 Jul 2026, 23:59.");
+  return L.join("\n");
+}
+function copy(txt, btn){
+  var done=function(){ var o=btn.textContent; btn.textContent="Copied"; setTimeout(function(){btn.textContent=o;},1400); };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(txt).then(done, function(){ fallback(txt); done(); });
+  } else { fallback(txt); done(); }
+  function fallback(t){
+    var ta=document.createElement("textarea"); ta.value=t;
+    ta.style.cssText="position:fixed;left:-9999px"; document.body.appendChild(ta);
+    ta.select(); try{document.execCommand("copy");}catch(e){} ta.remove();
+  }
+}
+
+/* ---------------- hash ---------------- */
+function writeHash(){
+  var p=["s="+state.sem];
+  var codes=Object.keys(state.picked);
+  if(codes.length) p.push("c="+codes.join(","));
+  if(state.eng) p.push("e="+state.eng);
+  var cu=POOL.filter(function(x){return x.custom;})
+             .map(function(x){ return [x.code,x.slot,x.cr,x.title].join("~"); });
+  if(cu.length) p.push("x="+encodeURIComponent(cu.join("|")));
+  try{ history.replaceState(null,"","#"+p.join("&")); }catch(e){}
+}
+function readHash(){
+  var h=(location.hash||"").replace(/^#/,""); if(!h) return;
+  var q={}; h.split("&").forEach(function(kv){ var i=kv.indexOf("="); if(i>0) q[kv.slice(0,i)]=kv.slice(i+1); });
+  if(q.x){
+    decodeURIComponent(q.x).split("|").forEach(function(s){
+      var a=s.split("~"); if(!a[0]) return;
+      if(!poolGet(a[0])) POOL.unshift({code:a[0],slot:a[1]||"",cr:a[2]||"",title:a[3]||"(added by hand)",dept:"Added by hand",v:0,custom:1});
+    });
+  }
+  if(q.s==="2") state.sem=2;
+  if(q.c) q.c.split(",").forEach(function(c){ if(c) state.picked[c]=true; });
+  if(q.e) state.eng=q.e;
+}
+
+/* ---------------- misc ---------------- */
+function esc(s){ var d=document.createElement("div"); d.textContent=s; return d.innerHTML; }
+
+function sync(){
+  renderGroups(); renderElist(); renderWeek(); renderStatus(); renderPrint();
+  renderReadiness(); renderPreflight(); renderReady();
+  var cur=CUR[state.sem], tot=totalCredits();
+  var n=$("totn"); n.textContent = (Math.round(tot*100)/100);
+  n.className = "n " + (tot===cur.total ? "ok" : tot>cur.total ? "no" : "");
+  $("totneed").textContent = cur.total;
+  $("semlab").textContent = cur.label;
+  writeHash();
+}
+
+/* ---------------- wire up ---------------- */
+Object.keys(SLOTS).forEach(function(L){
+  var o=document.createElement("option"); o.value=L; o.textContent="Slot "+L; $("cslot").appendChild(o);
+});
+
+$("semtoggle").addEventListener("click", function(e){
+  var b=e.target.closest("button"); if(!b) return;
+  state.sem = parseInt(b.dataset.s,10);
+  state.picked={}; state.eng=null;
+  [].forEach.call(this.querySelectorAll("button"), function(x){ x.classList.toggle("on", x===b); });
+  sync();
+});
+$("esearch").addEventListener("input", renderElist);
+$("onlyfree").addEventListener("change", renderElist);
+$("cadd").addEventListener("click", function(){
+  var code=($("ccode").value||"").trim().toUpperCase();
+  if(!code){ $("ccode").focus(); return; }
+  if(poolGet(code)){ state.eng=code; sync(); return; }
+  POOL.unshift({ code:code, slot:$("cslot").value, cr:($("ccr").value||"").trim(),
+                 title:($("cname").value||"").trim()||"(added by hand)", dept:"Added by hand", v:0, custom:1 });
+  state.eng=code;
+  $("ccode").value=""; $("ccr").value=""; $("cname").value=""; $("cslot").value="";
+  sync();
+});
+$("btnprint").addEventListener("click", function(){ window.print(); });
+$("btncopy").addEventListener("click", function(){ copy(asText(), this); });
+$("btnlink").addEventListener("click", function(){ writeHash(); copy(location.href, this); });
+$("btnclear").addEventListener("click", function(){
+  state.picked={}; state.eng=null; $("esearch").value=""; sync();
+});
+
+
+/* ==================== V3: guidance layer ==================== */
+
+/* ---------- glossary popover ---------- */
+var pop=document.getElementById("pop");
+function showPop(btn){
+  var k=btn.getAttribute("data-g"), g=GLOSS[k];
+  if(!g) return;
+  pop.innerHTML="";
+  var t=document.createElement("div"); t.className="pt"; t.textContent=g[0]; pop.appendChild(t);
+  var d=document.createElement("div"); d.textContent=g[1]; pop.appendChild(d);
+  pop.classList.add("on");
+  var r=btn.getBoundingClientRect(), sx=window.scrollX, sy=window.scrollY;
+  var w=pop.offsetWidth, left=Math.min(r.left+sx, sx+document.documentElement.clientWidth-w-14);
+  pop.style.left=Math.max(sx+8,left)+"px";
+  var top=r.bottom+sy+8;
+  if(r.bottom+pop.offsetHeight+14>window.innerHeight) top=r.top+sy-pop.offsetHeight-8;
+  pop.style.top=top+"px";
+}
+function hidePop(){ pop.classList.remove("on"); }
+document.addEventListener("click",function(e){
+  var b=e.target.closest(".gterm");
+  if(b){ e.preventDefault(); (pop.classList.contains("on")&&pop.__for===b)?hidePop():showPop(b); pop.__for=b; return; }
+  if(!e.target.closest("#pop")) hidePop();
+});
+document.addEventListener("keydown",function(e){ if(e.key==="Escape"){ hidePop(); closeDrawer(); } });
+window.addEventListener("scroll",hidePop,{passive:true});
+
+/* ---------- course detail drawer ---------- */
+var drawer=document.getElementById("drawer"), dbg=document.getElementById("dbg");
+function closeDrawer(){ drawer.classList.remove("on"); dbg.classList.remove("on"); }
+dbg.addEventListener("click",closeDrawer);
+document.getElementById("dclose").addEventListener("click",closeDrawer);
+
+var NATURE={"0":"theory","1":"lab","2":"design","3":"theory and lab","4":"design plus tutorial or lab",
+            "5":"project or thesis","6":"seminar"};
+var DEPTNAME={EM:"Entrepreneurship & Management",LA:"Liberal Arts",ME:"Mechanical & Aerospace",
+  AE:"Mechanical & Aerospace",EE:"Electrical Engineering",CS:"Computer Science & Engineering",
+  CE:"Civil Engineering",CH:"Chemical Engineering",AI:"Artificial Intelligence",CC:"Climate Change",
+  ET:"Energy Science & Technology",BM:"Biomedical Engineering",BT:"Biotechnology",
+  SE:"Sustainable Engineering",SM:"Smart Mobility",SD:"Semiconductor Materials & Devices",
+  AM:"Additive Manufacturing",LW:"Light Weight Materials"};
+
+function dropRule(cr){
+  var n=parseFloat(cr)||0;
+  if(n<=1) return "1 week from the start of the segment — 3 August 2026";
+  if(n<1.6) return "10 days from the start of the segment — 5 August 2026";
+  return "2 weeks from the start of the segment — 10 August 2026";
+}
+function openDetail(c){
+  var host=document.getElementById("dbody"); host.innerHTML="";
+  document.getElementById("dcode").textContent=c.code;
+  document.getElementById("dtitle").textContent=c.title||"Title not confirmed";
+
+  function sec(title){ var s=el("div","dsec"); if(title) s.appendChild(el("h5",null,title)); host.appendChild(s); return s; }
+  function kv(s,k,v){
+    if(v==null||v===""||v==="—") return;
+    var r=el("div","dkv"); r.appendChild(el("span","k",k));
+    var val=el("span","v"); val.textContent=v; r.appendChild(val); s.appendChild(r);
+  }
+
+  /* when it meets */
+  var s1=sec("When it meets");
+  if(c.slot && SLOTS[c.slot]){
+    kv(s1,"Slot","Slot "+c.slot);
+    var box=el("div","dmeet");
+    SLOTS[c.slot].forEach(function(p){ box.appendChild(el("div",null, DAYS[p[0]]+"  "+ROWLBL[p[1]])); });
+    s1.appendChild(box);
+    var occ=occupancy(), other=(occ[c.slot]||[]).filter(function(x){ return x.code!==c.code; });
+    if(other.length){
+      var w=el("div","dkv"); w.style.marginTop="9px";
+      w.appendChild(el("span","k","Clash"));
+      var wv=el("span","v"); wv.style.color="var(--bad)"; wv.style.fontWeight="620";
+      wv.textContent="Same slot as "+other.map(function(x){return x.code;}).join(", ");
+      w.appendChild(wv); s1.appendChild(w);
+    }
+  } else {
+    kv(s1,"Slot","Not published in AIMS. A clash cannot be ruled out — ask the department.");
+  }
+
+  /* the essentials */
+  var s2=sec("The essentials");
+  kv(s2,"Credits",(c.cr||"?")+" credits");
+  kv(s2,"Department", c.dept || DEPTNAME[c.code.slice(0,2)] || "—");
+  kv(s2,"Coordinator", c.coord);
+  kv(s2,"Room", c.room);
+  if(c.grp) kv(s2,"File under", TYPEHINT[c.grp]||"—");
+  kv(s2,"Last date to drop", dropRule(c.cr));
+
+  /* can you actually use this as your engineering elective? */
+  if(c.why!==undefined && c.why!==null && typeof WHYTXT!=="undefined"){
+    var sE=sec("Can you pick this?");
+    var pe=el("p"); pe.style.cssText="margin:0;font-size:13px;line-height:1.55;font-weight:600";
+    if(!c.why){ pe.style.color="var(--good)"; pe.textContent="Yes \u2014 Level 5 or 6, 3 credits, from a department your programme allows."; }
+    else if(c.why===4){ pe.style.color="var(--warn)"; pe.textContent="Probably, but its credits are not published. Confirm it is exactly 3 credits in AIMS before you rely on it."; }
+    else { pe.style.color="var(--bad)"; pe.textContent="No \u2014 "+WHYTXT[c.why]+". It is listed so you can see the whole timetable, not because you can register it."; }
+    sE.appendChild(pe);
+  }
+
+  /* what it actually teaches — only where IITH publishes it */
+  var dsc = (typeof DESC!=="undefined") ? DESC[c.code] : null;
+  var sT=sec("What it teaches");
+  if(dsc){
+    var p0=el("p"); p0.style.cssText="margin:0;font-size:13px;line-height:1.6;color:var(--ink2)";
+    p0.textContent=dsc[0]; sT.appendChild(p0);
+    if(dsc[3]){
+      var pr=el("div","dkv"); pr.style.marginTop="10px";
+      pr.appendChild(el("span","k","Prerequisite"));
+      var pv=el("span","v"); pv.textContent=dsc[3]; pr.appendChild(pv); sT.appendChild(pr);
+    }
+    var src=document.createElement("a");
+    src.href=dsc[2]; src.target="_blank"; src.rel="noopener";
+    src.style.cssText="display:inline-block;margin-top:10px;font-size:12px";
+    src.textContent="Source: "+dsc[1]+" \u2197";
+    sT.appendChild(src);
+  } else {
+    var p1=el("p"); p1.style.cssText="margin:0;font-size:13px;line-height:1.6;color:var(--ink3)";
+    p1.textContent="IITH does not publish a syllabus for this course anywhere public. The department office or the course instructor is the only reliable source for what it covers \u2014 ask before you register.";
+    sT.appendChild(p1);
+  }
+
+  /* code reused, titles disagree */
+  var tc = (typeof TITLECONFLICT!=="undefined") ? TITLECONFLICT[c.code] : null;
+  if(tc){
+    var sC=sec("Check this title");
+    var pc=el("p"); pc.style.cssText="margin:0;font-size:13px;line-height:1.55;color:var(--warn)";
+    pc.textContent=tc; sC.appendChild(pc);
+  }
+
+  /* what the load actually is — derived only from credits and the code, nothing invented */
+  var s25=sec("What the workload is");
+  var n=parseFloat(c.cr)||0;
+  var hours = n ? Math.round(n*14) : null;
+  var weeks = n>=3 ? "the full semester, about 16 weeks"
+            : n>=2 ? "four segments, about 11 weeks"
+            : n>=1.5 ? "three segments, about 8 weeks"
+            : n>=1 ? "two segments, about 5 weeks"
+            : "one segment, about 3 weeks";
+  var lb=el("div","loadbox");
+  function lrow(k,v){ var r=el("div","lrow"); r.appendChild(el("span","lk",k));
+                      r.appendChild(el("span","lv",v)); lb.appendChild(r); }
+  if(hours){
+    lrow("Teaching", hours+" hours in total");
+    lrow("Runs for", weeks);
+    lrow("Per week", "about "+(Math.round(n*10)/10)+" hours of class");
+  } else lrow("Teaching","Credits not confirmed — check AIMS");
+  lrow("Format", (NATURE[c.code[3]]||"unspecified")+"  (from the code\u2019s 2nd digit)");
+  s25.appendChild(lb);
+  var note=el("p");
+  note.style.cssText="margin:9px 0 0;font-size:12px;color:var(--ink3);line-height:1.5";
+  note.textContent="These are the only load facts IITH publishes. There is no official difficulty rating, no grade distribution and no course feedback, so nothing here tells you how hard it is \u2014 ask a senior or the instructor.";
+  s25.appendChild(note);
+
+  /* the code */
+  var s3=sec("What the code means");
+  var map=el("div","codemap");
+  [["cm0",c.code.slice(0,2)],["cm1",c.code[2]],["cm2",c.code[3]],["cm3",c.code.slice(4)]]
+    .forEach(function(p){ map.appendChild(el("span",p[0],p[1])); });
+  s3.appendChild(map);
+  var lvl=c.code[2], lvltxt = lvl>="5"&&lvl<="6" ? "Masters level — eligible as an engineering elective"
+        : lvl>="7" ? "PhD level" : "Undergraduate level — NOT eligible as an engineering elective";
+  kv(s3,"Department", DEPTNAME[c.code.slice(0,2)]||c.code.slice(0,2));
+  kv(s3,"Level", lvl+" · "+lvltxt);
+  kv(s3,"Nature", c.code[3]+" · "+(NATURE[c.code[3]]||"unspecified"));
+
+  /* status */
+  if(c.st && c.st!=="ok"){
+    var s4=sec("Status");
+    var p=el("p"); p.style.cssText="margin:0;font-size:13px;line-height:1.55;color:var(--ink2)";
+    p.textContent =
+      c.st==="blocked" ? "Timetabled and its registration window is open, but it does not appear in the AIMS course picker under any elective type. Email the DPGC the same day you notice it."
+    : c.st==="off"     ? "Not running this term. It appears on the curriculum sheet but is not in the JUL26-NOV26 course list at all."
+    : c.st==="noslot"  ? "Registerable, but AIMS publishes no slot or timings, so a clash cannot be ruled out."
+    : c.st==="next"    ? "A Semester 2 course. Slots are published closer to the term."
+    : c.st==="custom"  ? "You added this by hand. Nothing about it has been checked against the curriculum or against AIMS."
+    : "";
+    if(p.textContent) s4.appendChild(p);
+  }
+  if(c.notitle){
+    var s5=sec("Title");
+    var p2=el("p"); p2.style.cssText="margin:0;font-size:13px;line-height:1.55;color:var(--ink2)";
+    p2.textContent="The department publishes this timetable as a PDF whose course titles wrap across lines and could not be read back reliably. The slot and credits are verified; confirm the title in AIMS before you register.";
+    s5.appendChild(p2);
+  }
+
+  var gl = (typeof gcalLink==="function") ? gcalLink(c) : null;
+  if(gl){
+    var sG=sec("Add to your calendar");
+    var ga=document.createElement("a");
+    ga.className="btn ghost sm"; ga.href=gl; ga.target="_blank"; ga.rel="noopener";
+    ga.textContent="Add this course to Google Calendar";
+    sG.appendChild(ga);
+    var gn=el("p"); gn.style.cssText="margin:9px 0 0;font-size:12px;color:var(--ink3);line-height:1.5";
+    gn.textContent="This adds one weekly meeting. For every meeting of every course plus the deadlines, use the calendar download in section 3.";
+    sG.appendChild(gn);
+  }
+
+  drawer.classList.add("on"); dbg.classList.add("on");
+  document.getElementById("dclose").focus();
+}
+
+/* ---------- readiness ---------- */
+var manual={fa:false};
+function readiness(){
+  var cur=CUR[state.sem], sel=selected(), occ=occupancy();
+  var clashes=Object.keys(occ).filter(function(L){ return occ[L].length>1; });
+  var blocked=sel.filter(function(c){ return c.st==="blocked"; });
+  var steps=[];
+  cur.groups.forEach(function(g){
+    if(g.advisory) return;
+    steps.push({k:g.name, done: groupCredits(g.id)===g.need});
+  });
+  steps.push({k:"No clashes", done: clashes.length===0, bad: clashes.length>0});
+  steps.push({k:"Spoken to your FA", done: manual.fa});
+  return {steps:steps, done:steps.filter(function(s){return s.done}).length, total:steps.length,
+          clashes:clashes, blocked:blocked, sel:sel};
+}
+function renderReady(){
+  var r=readiness(), card=$("readycard");
+  var all = r.done===r.total;
+  card.classList.toggle("on", all);
+  if(!all) return;
+  var sel=r.sel, cur=CUR[state.sem], blocked=r.blocked;
+  var t = "Your plan is complete: "+totalCredits()+" of "+cur.total+" credits, no timetable clashes, and you have "+
+          "spoken to your Faculty Advisor. Take the script below into AIMS, or hand this list to the department "+
+          "office and ask them to enter it for you.";
+  if(blocked.length) t += "  One course needs an email first \u2014 see the red row below.";
+  $("readytext").textContent = t;
+
+  var host=$("readysum"); host.innerHTML="";
+  sel.forEach(function(c){
+    var r2=el("div","rsrow");
+    if(c.st==="blocked"){ r2.style.background="var(--bad-wash)"; }
+    r2.appendChild(el("span","c",c.code));
+    var tt=el("span","t",c.title);
+    if(c.st==="blocked"){ tt.textContent=c.title+"  \u2014 not in the AIMS picker, email nakul@em.iith.ac.in"; tt.style.color="var(--bad)"; }
+    r2.appendChild(tt);
+    r2.appendChild(el("span","s",(c.slot?"Slot "+c.slot:"no slot")+" \u00b7 "+c.cr+" cr"));
+    host.appendChild(r2);
+  });
+}
+function renderReadiness(){
+  var r=readiness(), host=document.getElementById("rsteps");
+  document.getElementById("rbar").style.width=Math.round(r.done/r.total*100)+"%";
+  document.getElementById("rcount").innerHTML="";
+  document.getElementById("rcount").appendChild(el("b",null,r.done+" of "+r.total));
+  document.getElementById("rcount").appendChild(document.createTextNode(" steps clear"));
+  host.innerHTML="";
+  r.steps.forEach(function(s){
+    var d=el("div","rstep"+(s.done?" done":s.bad?" blocked":""));
+    d.appendChild(el("span","tick", s.done?"✓":s.bad?"!":"○"));
+    d.appendChild(document.createTextNode(s.k));
+    host.appendChild(d);
+  });
+}
+
+/* ---------- pre-flight script + checklist ---------- */
+var ROWTYPE={core:"Departmental Core Theory", mgmt:"Departmental Elective",
+             eng:"Free Elective", mand:"Departmental Core Theory"};
+function renderPreflight(){
+  var host=document.getElementById("scriptbody"); host.innerHTML="";
+  var r=readiness(), sel=r.sel;
+  var acts=document.getElementById("scriptactions");
+
+  if(!sel.length || r.clashes.length){
+    acts.hidden=true;
+    var m=el("div","blockmsg");
+    m.appendChild(el("b",null, r.clashes.length ? "Fix the clash first" : "Nothing planned yet"));
+    m.appendChild(document.createTextNode(
+      r.clashes.length ? "Two of your courses meet at the same time. Registering both is the one mistake AIMS will happily let you make."
+                       : "Tick your courses above and the exact AIMS steps will be written out here."));
+    host.appendChild(m);
+  } else {
+    acts.hidden=false;
+    var ok=sel.filter(function(c){ return c.st!=="blocked"; });
+    var no=sel.filter(function(c){ return c.st==="blocked"; });
+    ok.forEach(function(c,i){
+      var row=el("div","scriptrow");
+      row.appendChild(el("div","srn","Row "+(i+1)));
+      var t=el("div","srtype");
+      t.appendChild(el("div","l","Elective type"));
+      t.appendChild(el("div","v", ROWTYPE[c.grp]||"Free Elective"));
+      row.appendChild(t);
+      row.appendChild(el("div","srcode",c.code));
+      host.appendChild(row);
+    });
+    no.forEach(function(c){
+      var row=el("div","scriptrow"); row.style.background="var(--bad-wash)";
+      row.appendChild(el("div","srn","Skip"));
+      var t=el("div","srtype");
+      t.appendChild(el("div","l","Do not add a row for this"));
+      var v=el("div","v"); v.style.color="var(--bad)";
+      v.textContent="Not in the AIMS picker \u2014 email the DPGC instead";
+      t.appendChild(v); row.appendChild(t);
+      var cd=el("div","srcode",c.code);
+      cd.style.background="transparent"; cd.style.color="var(--bad)";
+      cd.style.boxShadow="inset 0 0 0 1px var(--bad)";
+      row.appendChild(cd);
+      host.appendChild(row);
+    });
+  }
+
+  var addable=sel.filter(function(c){ return c.st!=="blocked"; }).length;
+  var CHECK=[
+    ["Open the JUL26-NOV26 row, not the other two","Three terms show as Open. The other two are last year and the summer term."],
+    ["Add one row per course with the + beside Regular","You need "+(addable||"—")+" rows for this plan."],
+    ["Set the elective type before searching for the course","The search will not open until you do, and the wrong type can get the whole submission rejected."],
+    ["Search by course code, not by scrolling","The browser opens at 10 per page across 60 pages, sorted by title."],
+    ["If a code returns nothing, email the DPGC that day","190 of the 786 running courses are missing from the picker. It will not fix itself."],
+    ["Press Register, then come back tomorrow","Your FA has to approve it. Rejections land in a collapsed list at the bottom that is easy to miss."],
+    ["Watch for the Clean India email from NSS","Mandatory, non-credit, and never appears in course registration."]
+  ];
+  var cl=document.getElementById("checklist"); cl.innerHTML="";
+  CHECK.forEach(function(c,i){
+    var li=document.createElement("li");
+    var cb=document.createElement("input"); cb.type="checkbox"; cb.id="chk"+i;
+    li.appendChild(cb);
+    var d=el("div");
+    var lab=document.createElement("label"); lab.className="ct"; lab.htmlFor="chk"+i; lab.textContent=c[0];
+    d.appendChild(lab); d.appendChild(el("div","cd",c[1]));
+    li.appendChild(d); cl.appendChild(li);
+  });
+}
+function scriptText(){
+  var sel=selected();
+  var L=["AIMS registration — "+CUR[state.sem].label+", JUL26-NOV26","",
+         "Menu → Academic → Course Registration → JUL26-NOV26 → Go For Registration","",
+         "Add "+sel.length+" rows with the + beside Regular, then fill them in:",""];
+  var ok=sel.filter(function(c){ return c.st!=="blocked"; });
+  var no=sel.filter(function(c){ return c.st==="blocked"; });
+  ok.forEach(function(c,i){
+    L.push("Row "+(i+1)+"   Elective type: "+(ROWTYPE[c.grp]||"Free Elective"));
+    L.push("        Course code : "+c.code+"   ("+c.title+")");
+  });
+  if(no.length){
+    L.push("", "DO NOT add rows for these \u2014 they are not in the AIMS picker:");
+    no.forEach(function(c){ L.push("   "+c.code+"  "+c.title+"  \u2192 email nakul@em.iith.ac.in"); });
+  }
+  L.push("", "Total "+totalCredits()+" of "+CUR[state.sem].total+" credits.");
+  L.push("Registration closes 31 Jul 2026, 23:59. Your FA still has to approve it.");
+  return L.join("\n");
+}
+
+/* ---------- reference sections ---------- */
+(function refs(){
+  var m=document.getElementById("mistlist");
+  if(m) MISTAKES.forEach(function(x,i){
+    var d=el("div","fault");
+    d.appendChild(el("div","n","Mistake "+String(i+1).padStart(2,"0")));
+    d.appendChild(el("h4",null,x[0]));
+    d.appendChild(el("p",null,x[1]));
+    var f=el("div","fix"); f.appendChild(el("b",null,"Guard: ")); f.appendChild(document.createTextNode(x[2]));
+    d.appendChild(f); m.appendChild(d);
+  });
+  var c=document.getElementById("codelist");
+  if(c) CODEPARTS.forEach(function(p){
+    var line=el("div"); line.style.marginBottom="6px";
+    line.appendChild(el("b",null,p[0]));
+    var s=document.createElement("span"); s.innerHTML=p[1]; line.appendChild(s);
+    c.appendChild(line);
+  });
+  var g=document.getElementById("glosslist");
+  if(g) Object.keys(GLOSS).forEach(function(k){
+    var d=el("div","dcard");
+    d.appendChild(el("div","dl",GLOSS[k][0]));
+    d.appendChild(el("p",null,GLOSS[k][1]));
+    g.appendChild(d);
+  });
+})();
+
+/* ---------- start-here toggle ---------- */
+(function start(){
+  var h=document.getElementById("starthead"), b=document.getElementById("startbody"),
+      hint=document.getElementById("starthint");
+  function toggle(){
+    var open=b.style.display!=="none";
+    b.style.display=open?"none":"grid";
+    hint.textContent=open?"Show":"Hide";
+    h.setAttribute("aria-expanded",String(!open));
+  }
+  h.addEventListener("click",toggle);
+  h.addEventListener("keydown",function(e){ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); toggle(); } });
+})();
+
+/* ---------- wiring ---------- */
+document.getElementById("btnscript").addEventListener("click",function(){ copy(scriptText(), this); });
+var bc=document.getElementById("btncal");
+if(bc) bc.addEventListener("click",function(){
+  var n=downloadICS(); var o=this.textContent;
+  this.textContent=n+" events downloaded"; var self=this;
+  setTimeout(function(){ self.textContent=o; }, 2600);
+});
+document.getElementById("faack").addEventListener("change",function(){ manual.fa=this.checked; sync(); });
+document.getElementById("edept").addEventListener("change",renderElist);
+var od=document.getElementById("onlydoc"); if(od) od.addEventListener("change",renderElist);
+var ok=document.getElementById("onlyok"); if(ok) ok.addEventListener("change",renderElist);
+
+
+
+/* ==================== calendar export ==================== */
+/* Real .ics: weekly recurring classes for the whole semester, plus the
+   deadlines, plus a reminder 15 minutes before every class. Imports into
+   Google Calendar, Apple Calendar and Outlook without any account access. */
+
+var TERM={ start:[2026,7,27], end:"20261113T235959",
+           firstDate:["20260727","20260728","20260729","20260730","20260731"] };
+var ENDT={"09:00":"095500","10:00":"105500","11:00":"115500","12:00":"125500",
+          "14:30":"155500","16:00":"172500"};
+function hhmmss(t){ return t.replace(":","")+"00"; }
+
+function icsEscape(s){
+  return String(s||"").replace(/\\/g,"\\\\").replace(/;/g,"\\;").replace(/,/g,"\\,")
+                      .replace(/\r?\n/g,"\\n");
+}
+function fold(line){
+  if(line.length<=73) return line;
+  var out=line.slice(0,73), rest=line.slice(73);
+  while(rest.length){ out+="\r\n "+rest.slice(0,72); rest=rest.slice(72); }
+  return out;
+}
+function buildICS(){
+  var sel=selected(), cur=CUR[state.sem], L=[];
+  var stamp="20260725T000000Z";            // fixed: the day this plan was generated
+  L.push("BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//IITH EM Course Planner//EN",
+         "CALSCALE:GREGORIAN","METHOD:PUBLISH",
+         "X-WR-CALNAME:IITH "+cur.label+" \u2014 Jul-Nov 2026",
+         "X-WR-TIMEZONE:Asia/Kolkata",
+         "BEGIN:VTIMEZONE","TZID:Asia/Kolkata","BEGIN:STANDARD",
+         "DTSTART:19700101T000000","TZOFFSETFROM:+0530","TZOFFSETTO:+0530",
+         "TZNAME:IST","END:STANDARD","END:VTIMEZONE");
+
+  var n=0;
+  sel.forEach(function(c){
+    if(!c.slot || !SLOTS[c.slot]) return;
+    SLOTS[c.slot].forEach(function(p,i){
+      var day=p[0], t=p[1];
+      var dt=TERM.firstDate[day]+"T"+hhmmss(t);
+      var de=TERM.firstDate[day]+"T"+ENDT[t];
+      n++;
+      L.push("BEGIN:VEVENT");
+      L.push("UID:"+c.code+"-"+day+"-"+t.replace(":","")+"-iithplanner@local");
+      L.push("DTSTAMP:"+stamp);
+      L.push("DTSTART;TZID=Asia/Kolkata:"+dt);
+      L.push("DTEND;TZID=Asia/Kolkata:"+de);
+      L.push("RRULE:FREQ=WEEKLY;UNTIL="+TERM.end+"Z");
+      L.push(fold("SUMMARY:"+icsEscape(c.code+" "+c.title)));
+      if(c.room) L.push(fold("LOCATION:"+icsEscape(c.room)));
+      L.push(fold("DESCRIPTION:"+icsEscape(
+        "Slot "+c.slot+" \u00b7 "+c.cr+" credits"+(c.coord?" \u00b7 "+c.coord:"")+
+        "\nGenerated by the IITH EM course planner. Verify against AIMS.")));
+      L.push("BEGIN:VALARM","TRIGGER:-PT15M","ACTION:DISPLAY",
+             fold("DESCRIPTION:"+icsEscape(c.code+" starts in 15 minutes")),"END:VALARM");
+      L.push("END:VEVENT");
+    });
+  });
+
+  /* the dates that cost you if you miss them */
+  var DEADLINES=[
+    ["20260731","AIMS registration closes today, 23:59","Every course record in AIMS says student registration ends today. The department email's 3 August date is later and will not help you."],
+    ["20260803","Last date to ADD a course","Also the last date to drop a 1-credit course."],
+    ["20260810","Last date to DROP a 3-credit course","No dropping after this, even with a fine."],
+    ["20260727","Classes begin","Semester 1 of the Jul-Nov 2026 term."]
+  ];
+  DEADLINES.forEach(function(d,i){
+    L.push("BEGIN:VEVENT");
+    L.push("UID:deadline-"+i+"-iithplanner@local");
+    L.push("DTSTAMP:"+stamp);
+    L.push("DTSTART;VALUE=DATE:"+d[0]);
+    L.push("DTEND;VALUE=DATE:"+d[0]);
+    L.push(fold("SUMMARY:"+icsEscape("IITH \u2014 "+d[1])));
+    L.push(fold("DESCRIPTION:"+icsEscape(d[2])));
+    L.push("BEGIN:VALARM","TRIGGER:-P1D","ACTION:DISPLAY",
+           fold("DESCRIPTION:"+icsEscape(d[1])),"END:VALARM");
+    L.push("END:VEVENT");
+    n++;
+  });
+
+  L.push("END:VCALENDAR");
+  return {text:L.join("\r\n"), count:n};
+}
+function downloadICS(){
+  var r=buildICS();
+  var blob=new Blob([r.text],{type:"text/calendar;charset=utf-8"});
+  var url=URL.createObjectURL(blob);
+  var a=document.createElement("a");
+  a.href=url; a.download="iith-"+CUR[state.sem].label.toLowerCase().replace(/\s+/g,"-")+".ics";
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 2000);
+  return r.count;
+}
+/* one-click Google link for a single course, used in the drawer */
+function gcalLink(c){
+  if(!c.slot || !SLOTS[c.slot]) return null;
+  var p=SLOTS[c.slot][0], day=p[0], t=p[1];
+  var q=["action=TEMPLATE",
+    "text="+encodeURIComponent(c.code+" "+c.title),
+    "dates="+TERM.firstDate[day]+"T"+hhmmss(t)+"/"+TERM.firstDate[day]+"T"+ENDT[t],
+    "ctz=Asia/Kolkata",
+    "recur="+encodeURIComponent("RRULE:FREQ=WEEKLY;UNTIL="+TERM.end+"Z"),
+    "details="+encodeURIComponent("Slot "+c.slot+". This link adds only the first weekly meeting of the slot \u2014 use the full .ics download for every meeting.")];
+  if(c.room) q.push("location="+encodeURIComponent(c.room));
+  return "https://calendar.google.com/calendar/render?"+q.join("&");
+}
+
+/* ---------- boot (last, so every module above is defined) ---------- */
+readHash();
+if(state.sem===2){
+  [].forEach.call($("semtoggle").querySelectorAll("button"), function(x){ x.classList.toggle("on", x.dataset.s==="2"); });
+}
+sync();
+})();
+
+</script>
+</body>
+</html>
