@@ -514,6 +514,12 @@ function openDetail(c){
   kv(s2,"Department", c.dept || DEPTNAME[c.code.slice(0,2)] || "—");
   kv(s2,"Coordinator", c.coord);
   kv(s2,"Room", c.room);
+  /* Engineering electives come from other departments; this planner has no
+     instructor list for them, and inventing one is forbidden. Point to the
+     authoritative source instead of leaving the field silently blank. */
+  if(!c.coord && c.why!==undefined){
+    kv(s2,"Instructor","Not listed here — the offering department’s course page or AIMS shows who teaches it. Confirm there before you register.");
+  }
   if(c.grp) kv(s2,"File under", TYPEHINT[c.grp]||"—");
   kv(s2,"Last date to drop", dropRule(c.cr));
 
@@ -561,18 +567,31 @@ function openDetail(c){
   var s25=sec("What the workload is");
   var n=parseFloat(c.cr)||0;
   var hours = n ? Math.round(n*14) : null;
+  var weeksNum = n>=3 ? 16 : n>=2 ? 11 : n>=1.5 ? 8 : n>=1 ? 5 : 3;
   var weeks = n>=3 ? "the full semester, about 16 weeks"
             : n>=2 ? "four segments, about 11 weeks"
             : n>=1.5 ? "three segments, about 8 weeks"
             : n>=1 ? "two segments, about 5 weeks"
             : "one segment, about 3 weeks";
+  /* Per-week class hours come from the ACTUAL weekly meetings in the slot
+     (A–G are 55-min sessions, P–S are 90-min), not from the credit number —
+     the old code printed the credit count as hours ("1 hours" for a 1-credit
+     course, when it really meets ~3 h/week over fewer weeks). Falls back to
+     total hours ÷ weeks when no slot is published. */
+  function weeklyHours(slot){
+    if(!slot || !SLOTS[slot]) return null;
+    var perSession = /^[A-G]$/.test(slot) ? 55 : 85;
+    return SLOTS[slot].length * perSession / 60;
+  }
   var lb=el("div","loadbox");
   function lrow(k,v){ var r=el("div","lrow"); r.appendChild(el("span","lk",k));
                       r.appendChild(el("span","lv",v)); lb.appendChild(r); }
   if(hours){
     lrow("Teaching", hours+" hours in total");
     lrow("Runs for", weeks);
-    lrow("Per week", "about "+(Math.round(n*10)/10)+" hours of class");
+    var wk = weeklyHours(c.slot) || (hours/weeksNum);
+    var wr = Math.round(wk*2)/2;
+    lrow("Per week", "about "+wr+" hour"+(wr===1?"":"s")+" of class");
   } else lrow("Teaching","Credits not confirmed — check AIMS");
   lrow("Format", (NATURE[c.code[3]]||"unspecified")+"  (from the code\u2019s 2nd digit)");
   s25.appendChild(lb);
