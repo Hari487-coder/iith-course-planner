@@ -35,6 +35,16 @@ src/app.js       all behaviour, wrapped in one IIFE
 dist/index.html  the built artifact — this is what gets deployed
 ```
 
+The **Ask assistant** (`askAssistant()` IIFE in `src/app.js`, markup + styles in
+`src/shell.html`) is a grounded, offline help chat. It answers ONLY from data
+already in the page — `GLOSS`, `MISTAKES`, `CUR`, the `POOL`/`ENG` catalogue,
+`DESC`, and the live selection via `readiness()`/`guideState()` — through keyword
+intents, a glossary matcher, and course-code lookup. Deliberately **not** an LLM:
+a static keyless page can't hold an API key safely, and a rule-based answerer
+can't invent a wrong course fact (the project's cardinal rule). No network, no
+storage — same guarantees as the rest of the tool. To extend it, add an entry to
+`INTENTS` or a term to `GLOSS`; keep answers in plain language.
+
 `dist/index.html` is generated. Never edit it directly; your change will be
 overwritten on the next build.
 

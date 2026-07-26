@@ -1026,6 +1026,177 @@ function gcalLink(c){
   return "https://calendar.google.com/calendar/render?"+q.join("&");
 }
 
+/* ================== Ask assistant ==================
+   A grounded, offline helper. It answers ONLY from this tool's own
+   verified data (glossary, mistakes, curriculum, course catalogue,
+   deadlines) and the student's live selection — so it can explain things
+   in plain words without ever inventing a course fact. No network, no
+   keys, nothing leaves the browser: the same guarantees as the rest of
+   the page. */
+(function askAssistant(){
+  var fab=$("askfab"), panel=$("askpanel"), log=$("asklog"), chipbar=$("askchips"),
+      form=$("askform"), input=$("askinput"), closeBtn=$("askclose");
+  if(!fab||!panel||!form) return;
+  var started=false;
+  var DEFAULT_CHIPS=["What's an engineering elective?","When's the deadline?","How do I register in AIMS?","What is a slot?","Am I ready?"];
+
+  function reduced(){ return window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches; }
+  function open(){
+    panel.hidden=false; document.body.classList.add("askopen");
+    fab.setAttribute("aria-expanded","true");
+    if(!started){ started=true; greet(); }
+    setTimeout(function(){ input.focus(); }, 60);
+  }
+  function close(){
+    panel.hidden=true; document.body.classList.remove("askopen");
+    fab.setAttribute("aria-expanded","false"); fab.focus();
+  }
+  function goTo(id){
+    var t=$(id); if(!t) return;
+    if(window.innerWidth<=560) close();
+    t.scrollIntoView({behavior: reduced()?"auto":"smooth", block:"start"});
+  }
+  function bubble(who, text, link){
+    var d=el("div","askmsg "+who);
+    d.appendChild(el("span",null,text));
+    if(link){
+      var a=el("button","asklink",link.text); a.type="button";
+      a.addEventListener("click",function(){ goTo(link.to); });
+      d.appendChild(a);
+    }
+    log.appendChild(d); log.scrollTop=log.scrollHeight;
+  }
+  function setChips(list){
+    chipbar.innerHTML="";
+    (list||DEFAULT_CHIPS).forEach(function(q){
+      var b=el("button","askchip",q); b.type="button";
+      b.addEventListener("click",function(){ send(q); });
+      chipbar.appendChild(b);
+    });
+  }
+  function greet(){
+    bubble("bot","Hi! I explain how to register for Jul–Nov 2026 in plain words — slots, credits, the engineering elective, clashes, deadlines, or any course code like EM5090. What would you like to know?");
+    setChips();
+  }
+  function send(q){
+    q=(q||"").trim(); if(!q) return;
+    bubble("me", q);
+    var r=respond(q);
+    bubble("bot", r.text, r.link);
+    setChips(r.chips);
+  }
+
+  /* ---- resolvers, all grounded in this tool's data ---- */
+  function norm(s){ return (s||"").toLowerCase().replace(/[^a-z0-9\s]/g," ").replace(/\s+/g," ").trim(); }
+
+  function curGet(code){
+    code=code.toUpperCase();
+    for(var s=1;s<=2;s++){ var gs=CUR[s].groups;
+      for(var i=0;i<gs.length;i++){ var cs=gs[i].courses||[];
+        for(var j=0;j<cs.length;j++){ if((cs[j][0]||"").toUpperCase()===code)
+          return {code:cs[j][0],title:cs[j][1],cr:cs[j][2],slot:cs[j][3],st:cs[j][6],gname:gs[i].name}; } } }
+    return null;
+  }
+  function courseAnswer(code){
+    code=code.toUpperCase();
+    var cu=curGet(code), p=poolGet(code);
+    if(!cu && !p) return {text: code+" isn't in the Jul–Nov 2026 catalogue I have. If AIMS lists it, it may be from a department whose timetable isn't public — confirm the details there before you rely on it.", chips:DEFAULT_CHIPS};
+    var slot=cu?cu.slot:p.slot, cr=cu?cu.cr:p.cr, title=cu?cu.title:(p.notitle?"":p.title);
+    var L=[];
+    L.push(code+(title?" — "+title:" (title not confirmed — check AIMS)"));
+    L.push(cu ? ("One of your "+cu.gname+" courses.") : ("Offered by "+p.dept+"."));
+    L.push(slot && SLOTS[slot] ? ("Meets in slot "+slot+" — "+slotHuman(slot)+".") : "No slot or timing is published for it yet.");
+    L.push(cr ? (cr+" credits.") : "Credits aren't published — confirm in AIMS.");
+    if(!cu && p){
+      if(p.why===0) L.push("You can take this as your engineering elective (Level 5–6, 3 credits, an allowed department).");
+      else if(p.why===4) L.push("It might work as your engineering elective, but confirm it's exactly 3 credits in AIMS first.");
+      else if(typeof WHYTXT!=="undefined" && WHYTXT[p.why]) L.push("You can't use it as your engineering elective — "+WHYTXT[p.why].toLowerCase()+".");
+    }
+    var d=(typeof DESC!=="undefined") && DESC[code];
+    if(d && d[0]) L.push("What it covers: "+d[0]);
+    if((cu && state.picked[code]) || state.eng===code) L.push("It's in your plan right now.");
+    return {text:L.join("\n"), chips:["Am I ready?","When's the deadline?","How do I register in AIMS?"]};
+  }
+  function readyAnswer(){
+    var r=readiness(), cur=CUR[state.sem], s=guideState();
+    if(s.label==="Ready") return {text:"You're all set for "+cur.label+": "+totalCredits()+" of "+cur.total+" credits, no clashes, and your Faculty Advisor is confirmed. Open AIMS and copy your rows straight in.", link:{text:"Open the AIMS steps →",to:"how"}, chips:["When's the deadline?","Add reminders to my calendar"]};
+    return {text:"Not yet — you're "+r.done+" of "+r.total+" steps in.\nNext: "+s.msg, chips:["What's an engineering elective?","How do I register in AIMS?","When's the deadline?"]};
+  }
+  function creditsAnswer(){
+    var cur=CUR[state.sem], L=["Semester "+state.sem+" is "+cur.total+" credits. You've picked "+totalCredits()+" so far.","The split:"];
+    cur.groups.forEach(function(g){ if(g.advisory) return; L.push("• "+g.name+": "+g.need+" credit"+(g.need===1?"":"s")); });
+    return {text:L.join("\n"), chips:["What's an engineering elective?","What is a credit?"]};
+  }
+
+  var GLOSS_SYN={"faculty advisor":"fa","advisor":"fa","committee":"dpgc","non credit":"clean india","nss":"clean india","gpa":"cgpa"};
+  function glossaryMatch(q){
+    var hasQ=/\b(what|whats|define|meaning|means|mean|explain)\b/.test(q);
+    var key=null, len=0;
+    function consider(term,k){ var n=term.split(" ").length; if(q.indexOf(term)>=0 && n>=len){ len=n; key=k; } }
+    for(var g in GLOSS){ consider(g,g); }
+    for(var syn in GLOSS_SYN){ consider(syn,GLOSS_SYN[syn]); }
+    if(!key || !GLOSS[key]) return null;
+    return {score: len+(hasQ?1:0), ans:{text: GLOSS[key][0]+" — "+GLOSS[key][1], chips:DEFAULT_CHIPS}};
+  }
+
+  var INTENTS=[
+    {kw:["how do i register","how to register","register in aims","registration steps","fill the form","fill aims","steps in aims","use aims","how do i submit"], build:function(){
+      return {text:"In AIMS, the whole thing is:\n1. Menu → Academic → Course Registration.\n2. Choose the JUL26-NOV26 term (not the summer or last-year one) → Go For Registration.\n3. For each course, press the + beside ‘Regular’ to add a row.\n4. Set the elective type FIRST, then search by course code.\n5. Press Register — then come back the next day to check your Faculty Advisor approved it.", link:{text:"Open the full step-by-step →",to:"how"}, chips:["What elective type do I pick?","When's the deadline?","Am I ready?"]}; }},
+    {kw:["deadline","last date","last day","when is registration","when does registration","closes","due date","register by","how long do i have","cutoff","cut off","important dates","key dates"], build:function(){
+      return {text:"The dates that matter for Jul–Nov 2026:\n• Classes begin: 27 July 2026\n• Registration closes: 31 July 2026, 23:59 — treat this as the real one. A department email says 3 August, but every AIMS record says 31 July.\n• Last day to add a course (and to drop a 1-credit one): 3 August\n• Last day to drop a 3-credit course: 10 August", link:{text:"See the dates table →",to:"dates"}, chips:["Add reminders to my calendar","How do I register in AIMS?"]}; }},
+    {kw:["clash","clashes","overlap","same time","same slot","conflict"], build:function(){
+      return {text:"A clash means two of your courses sit in the same slot (same letter), so they'd meet at the same time. No instructor moves a class for one student, so you have to swap one out. This planner flags a clash the moment it happens and hides clashing options in the picker — AIMS will let you register both and you'd only find out in week one.", chips:["What is a slot?","Am I ready?"]}; }},
+    {kw:["engineering elective","eng elective","free elective","other department","another department","open elective","which elective can i take"], build:function(){
+      return {text:"Your engineering elective is one 3-credit course from another department that you pick yourself. The rules:\n• The code must start with 5 or 6 (Masters level).\n• It can't be from Design, Physics, Chemistry or Maths.\n• It must be worth exactly 3 credits.\n• Talk to your Faculty Advisor before choosing.\nIn the picker, anything you can actually take is shown; the rest is hidden by default.", link:{text:"Go to the picker →",to:"esearch"}, chips:["Why can't I pick some courses?","What elective type do I pick?"]}; }},
+    {kw:["elective type","which type","what type","category to pick","file it under","file under","registration type","departmental core"], build:function(){
+      return {text:"When AIMS asks for an ‘elective type’, use:\n• Core (EM) courses → Departmental Core Theory\n• Department electives → Departmental Elective\n• Engineering elective → Free Elective\nChoose the type BEFORE you search — the search won't open until you do, and the wrong type can get your whole submission rejected. This planner writes the exact type beside every course.", chips:["How do I register in AIMS?","Am I ready?"]}; }},
+    {kw:["how many credits","total credits","credits do i need","credit requirement","how many credit","credits needed","credit total"], build:creditsAnswer},
+    {kw:["fractal","segment","segments","modules","blocks","half a credit","module system"], build:function(){
+      return {text:"The semester is six blocks (‘segments’) of about 2.5–3 weeks. A course can run any stretch of them: 1–6 is the whole term, 1–2 is just the first two blocks. Length is the credit — two blocks is roughly 1 credit — which is why your department electives are 1 credit each instead of one big course.", link:{text:"See it explained →",to:"fractal"}, chips:["What is a credit?","When's the deadline?"]}; }},
+    {kw:["mistake","mistakes","go wrong","common error","pitfall","things to avoid","what could go wrong"], build:function(){
+      return {text:"The eight things that trip people up: registering into the wrong term, picking the wrong elective type, a timetable clash, choosing a course that isn't allowed, assuming a course exists when AIMS doesn't list it, missing the real deadline, thinking you're done before your FA approves, and forgetting the non-credit Clean India course. This tool guards against each one.", link:{text:"Read all eight →",to:"mistakes"}, chips:["Am I ready?","How do I register in AIMS?"]}; }},
+    {kw:["easy","hard","difficult","difficulty","scoring","which is easy","workload","how tough","grade distribution","easiest"], build:function(){
+      return {text:"There's no ‘easy’ or ‘hard’ rating here, on purpose — IITH doesn't publish grade distributions, course feedback or workload data, so any rating would be made up. The honest way to judge a course is its syllabus (open it with the ⓘ button), its credit weight, and asking a senior who took it or the instructor.", chips:["What is a credit?","What's an engineering elective?"]}; }},
+    {kw:["what is a slot","slot grid","slots","timetable","when does it meet","what time","meeting time","class timing","schedule"], build:function(){
+      return {text:GLOSS.slot[1]+"\nOpen the slot grid to see exactly which letters meet when.", link:{text:"See the slot grid →",to:"slots"}, chips:["What is a clash?","Am I ready?"]}; }},
+    {kw:["who do i contact","who to email","contact","email","advisor","dpgc","stuck","missing from aims","not showing in aims","can't find course","course missing"], build:function(){
+      return {text:"Who to reach:\n• Faculty Advisor — Dr. Ranapratap Maradana — approves your registration and every add or drop.\n• DPGC — Dr. Nakul Parameswar — email this person the same day if a course is missing from AIMS or a rule is unclear.\n• Department office — for anything general.\nTheir email addresses are in the footer of this page.", chips:["Why is a course missing from AIMS?","How do I register in AIMS?"]}; }},
+    {kw:["calendar","reminder","reminders","google calendar","ics","add to calendar","notify"], build:function(){
+      return {text:"Yes — once your plan is set you can put it in your calendar. The ‘Add to calendar (.ics)’ button downloads every class for the whole semester plus the add/drop deadlines, each with a reminder; it opens in Google, Apple or Outlook Calendar. When your plan is complete there's also a one-click ‘Add deadline to Google Calendar’ button.", link:{text:"Go to the calendar buttons →",to:"wkcard"}, chips:["When's the deadline?","Am I ready?"]}; }},
+    {kw:["semester 2","sem 2","second semester","semester two","next semester","difference between semester"], build:function(){
+      var c=CUR[2], L=["Semester 2 is also "+c.total+" credits, but the mix is different:"];
+      c.groups.forEach(function(g){ if(g.advisory) return; L.push("• "+g.name+": "+g.need+" credit"+(g.need===1?"":"s")); });
+      L.push("Switch to the Semester 2 tab at the top to plan it.");
+      return {text:L.join("\n"), chips:["What's an engineering elective?","When's the deadline?"]}; }},
+    {kw:["is this official","who made this","who built","accurate","can i trust","reliable","is this correct","unofficial","who runs"], build:function(){
+      return {text:"This is an unofficial, student-made planner for the M.Tech Techno-Entrepreneurship programme, built from IITH's published timetables, the department orientation deck and live AIMS data for Jul–Nov 2026. It's here to help you plan and catch mistakes — but always confirm in AIMS before you register, and talk to your Faculty Advisor about the engineering elective.", chips:DEFAULT_CHIPS}; }},
+    {kw:["hi","hello","hey","help","what can you do","get started","how does this work","thanks","thank you"], build:function(){
+      return {text:"Happy to help. I can explain slots, credits, the engineering elective, clashes, deadlines, how to register in AIMS, or any course code like EM5090 — in plain words. What's your question?", chips:DEFAULT_CHIPS}; }}
+  ];
+
+  function respond(raw){
+    var q=norm(raw);
+    var m=raw.match(/\b([a-zA-Z]{2}\d{4})\b/);
+    if(m) return courseAnswer(m[1]);
+    if(/\b(am i ready|ready to register|whats left|what s left|what next|what do i do next|have i finished|is my plan)\b/.test(q)) return readyAnswer();
+    if(/\bwhy (can t|cant|can not|cannot) i (pick|take|choose|select)\b/.test(q)) return {text:"A course is greyed out or hidden if it can't be your engineering elective — usually because it isn't Level 5–6, it's worth other than 3 credits, or it's from an excluded department (Design, Physics, Chemistry, Maths). Untick ‘Only ones I can pick’ in the picker to see them all with the reason on each.", link:{text:"Go to the picker →",to:"esearch"}, chips:["What's an engineering elective?","Am I ready?"]};
+    var best=null, bestScore=0;
+    for(var i=0;i<INTENTS.length;i++){ var sc=0, kws=INTENTS[i].kw;
+      for(var k=0;k<kws.length;k++){ if(q.indexOf(kws[k])>=0) sc+=kws[k].split(" ").length; }
+      if(sc>bestScore){ bestScore=sc; best=INTENTS[i]; } }
+    var gl=glossaryMatch(q);
+    if(gl && gl.score>=bestScore && gl.score>0) return gl.ans;
+    if(best && bestScore>0) return best.build();
+    if(gl && gl.score>0) return gl.ans;
+    return {text:"I'm not sure about that one — I only answer from what this planner knows for sure. Try the engineering elective, credits, slots, clashes, deadlines, how to register, or a course code like EM5090.", chips:DEFAULT_CHIPS};
+  }
+
+  fab.addEventListener("click", open);
+  closeBtn.addEventListener("click", close);
+  form.addEventListener("submit", function(e){ e.preventDefault(); var v=input.value; input.value=""; send(v); });
+  document.addEventListener("keydown", function(e){ if(e.key==="Escape" && !panel.hidden) close(); });
+})();
+
 /* ---------- boot (last, so every module above is defined) ---------- */
 readHash();
 if(state.sem===2){
