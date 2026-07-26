@@ -10,8 +10,11 @@ institute's registration portal — lets students make mistakes it never warns t
 about: timetable clashes, wrong elective categories, courses that silently do not
 appear in the picker.
 
-The product is **one HTML file**. No framework, no npm, no bundler, no network
-requests at runtime. `build.py` concatenates four source files into `dist/index.html`.
+The product is **one HTML file**. No framework, no npm, no bundler. `build.py`
+concatenates four source files into `dist/index.html`. The single runtime network
+exception: Google Fonts (Bricolage Grotesque, Geist, JetBrains Mono) for the
+Daybreak design system — the skin ported from the mortgage-platform's
+`apps/web/app/globals.css`. Everything else stays offline and dependency-free.
 
 ## Build
 

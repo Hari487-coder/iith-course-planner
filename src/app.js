@@ -68,12 +68,12 @@ var TYPEHINT = { core:"Departmental Core Theory", mgmt:"Departmental Elective",
     var th=document.createElement("td"); th.innerHTML="<b>"+day+"</b>"; tr.appendChild(th);
     COLS.forEach(function(t){
       var td=document.createElement("td");
-      if(t==="LUNCH"){ td.innerHTML='<span style="color:#A9AEB5;font-size:11px">lunch</span>'; }
+      if(t==="LUNCH"){ td.innerHTML='<span style="color:#8b89a4;font-size:11px">lunch</span>'; }
       else {
         var L=at[di+"|"+t];
-        if(L) td.innerHTML='<b class="mono" style="color:#1E3A5F">'+L+'</b>';
-        else if(di===2 && (t==="14:30"||t==="16:00")) td.innerHTML='<span style="color:#A9AEB5;font-size:11px">challenge<br>lectures</span>';
-        else td.innerHTML='<span style="color:#D5D2CB">&middot;</span>';
+        if(L) td.innerHTML='<b class="mono" style="color:#3a55c4">'+L+'</b>';
+        else if(di===2 && (t==="14:30"||t==="16:00")) td.innerHTML='<span style="color:#8b89a4;font-size:11px">challenge<br>lectures</span>';
+        else td.innerHTML='<span style="color:#d6d4e6">&middot;</span>';
       }
       tr.appendChild(td);
     });
@@ -98,7 +98,7 @@ function renderGroups(){
     wrap.appendChild(head);
 
     var rule = el("div","grule");
-    rule.innerHTML = g.rule + ' <span style="color:#A9AEB5">&middot; register under <b style="color:#4A4E55">'
+    rule.innerHTML = g.rule + ' <span style="color:#8b89a4">&middot; register under <b style="color:#55536e">'
                    + TYPEHINT[g.id] + '</b></span>';
     wrap.appendChild(rule);
 
@@ -107,10 +107,10 @@ function renderGroups(){
       cho.style.paddingTop = "0";
       var p = state.eng ? poolGet(state.eng) : null;
       if(p){
-        cho.innerHTML = '<b style="color:#0F766E">'+p.code+'</b> &mdash; '+esc(p.title)+
+        cho.innerHTML = '<b style="color:#0c7d55">'+p.code+'</b> &mdash; '+esc(p.title)+
                         ' &middot; slot <b class="mono">'+(p.slot||"none")+'</b>';
       } else {
-        cho.innerHTML = '<i style="color:#A9AEB5">Nothing chosen yet &mdash; use the picker below.</i>';
+        cho.innerHTML = '<i style="color:#8b89a4">Nothing chosen yet &mdash; use the picker below.</i>';
       }
       wrap.appendChild(cho);
       host.appendChild(wrap);
