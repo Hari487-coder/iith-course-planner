@@ -1216,6 +1216,58 @@ function gcalLink(c){
   document.addEventListener("keydown", function(e){ if(e.key==="Escape" && !panel.hidden) close(); });
 })();
 
+/* ---------- desktop rail: scroll-spy the active section ----------
+   Direct (time-throttled) scroll handler rather than rAF, so it still
+   updates if the tab's animation frames are throttled. */
+(function railSpy(){
+  var rail=document.getElementById("railnav"); if(!rail) return;
+  var links=[].slice.call(rail.querySelectorAll("a[data-spy]"));
+  if(!links.length) return;
+  var ids=links.map(function(a){ return a.getAttribute("data-spy"); })
+               .filter(function(id){ return document.getElementById(id); });
+  ids.sort(function(a,b){
+    var ea=document.getElementById(a), eb=document.getElementById(b);
+    return (ea.compareDocumentPosition(eb) & Node.DOCUMENT_POSITION_FOLLOWING) ? -1 : 1;
+  });
+  function setActive(id){ links.forEach(function(a){ a.classList.toggle("active", a.getAttribute("data-spy")===id); }); }
+  var last=0;
+  function update(){
+    var line=140, current=ids[0];
+    ids.forEach(function(id){ var e=document.getElementById(id); if(e && e.getBoundingClientRect().top<=line) current=id; });
+    setActive(current);
+  }
+  function onScroll(){ var t=Date.now(); if(t-last<80) return; last=t; update(); }
+  window.addEventListener("scroll", onScroll, {passive:true});
+  window.addEventListener("resize", onScroll, {passive:true});
+  update();
+})();
+
+/* ---------- scroll-reveal for the reference sections ----------
+   Fail-safe: in-view sections are revealed synchronously and again when the
+   tab becomes visible, so content is NEVER left hidden if IntersectionObserver
+   callbacks are throttled. IO only animates the ones still below the fold. */
+(function reveal(){
+  if(window.innerWidth < 700) return;
+  if(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  var els=[].slice.call(document.querySelectorAll(".prose"));
+  if(!els.length) return;
+  els.forEach(function(el){ el.classList.add("reveal"); });
+  function show(el){ el.classList.add("seen"); }
+  function revealInView(){
+    els.forEach(function(el){ if(!el.classList.contains("seen") && el.getBoundingClientRect().top < window.innerHeight*0.92) show(el); });
+  }
+  revealInView();
+  if("IntersectionObserver" in window){
+    var io=new IntersectionObserver(function(entries){
+      entries.forEach(function(e){ if(e.isIntersecting){ show(e.target); io.unobserve(e.target); } });
+    }, {rootMargin:"0px 0px -8% 0px", threshold:0.04});
+    els.forEach(function(el){ if(!el.classList.contains("seen")) io.observe(el); });
+  } else {
+    els.forEach(show);
+  }
+  document.addEventListener("visibilitychange", function(){ if(!document.hidden) revealInView(); });
+})();
+
 /* ---------- boot (last, so every module above is defined) ---------- */
 readHash();
 if(state.sem===2){
