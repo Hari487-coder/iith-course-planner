@@ -57,15 +57,6 @@ var CUR={
  ]}
 };
 
-/* what students in the batches above actually took, from the department orientation deck.
-   Codes matched by title against the Jul-Nov 2026 catalogue where a match exists. */
-var SENIORS=[
- ["Semester 1","2024-26",[["Deep Learning","AI5100","D"],["Advanced NLP","","audit only"],["Linear Optimization","",""],["Sustainability","SE5723","A"]]],
- ["Semester 1","2025-27",[["Machine learning and its application","AI5000","C"],["Deep Learning","AI5100","D"],["Probability and Stochastic Process","AI5030","S"],["Concepts of Sustainability","SE5723","A"]]],
- ["Semester 2","2024-26",[["Computer Vision","",""],["NLP","",""],["Fraud Analytics","",""],["Machine Learning for Mechanical Engineering","",""]]],
- ["Semester 2","2025-27",[["E-Waste Recycling Methods","",""],["Image Analysis","",""],["Network Security","",""],["Instrumentation for efficient recycling and automation","",""]]]
-];
-
 var LATER=[["Semester 3","EM6085 Project Stage I — problem definition and business plan",12],
            ["Semester 4","EM6095 Project Stage II — build a prototype or proof of concept",12]];
 
@@ -406,7 +397,7 @@ var CODEPARTS=[
 var MISTAKES=[
  ["Registering into the wrong semester","Three terms show as “Open” in AIMS at the same time — JUL26-NOV26, the 2026 summer term, and last year’s JUL25-NOV25. Nothing highlights the current one.","This planner only ever describes JUL26-NOV26, and the AIMS steps tell you exactly which row to click."],
  ["Picking the wrong elective type","Fourteen options, no explanation, and the same course list under every one. The wrong choice can get your entire submission rejected after you have waited for approval.","Every course group here tells you the exact type to file it under, and the pre-flight script repeats it row by row."],
- ["A timetable clash you find in week one","AIMS never shows a slot in the registration form. You can register two courses that meet at the same hour and only discover it when you are standing in the wrong corridor.","Clashes are flagged the moment they happen, and clashing options are hidden from the picker by default."],
+ ["A plan that falls apart at registration","The registration form never shows a slot next to a course, so you build your plan blind. AIMS does warn you when courses clash — but by then the whole plan is assembled around the clashing pair and you are redoing it against the deadline.","Clashes are flagged the moment they happen, and clashing options are hidden from the picker by default."],
  ["Choosing a course that is not allowed","The engineering elective must be Level 5 or 6 and cannot come from Design, Physics, Chemistry or Maths. AIMS enforces none of this.","Every course is labelled with whether you can actually pick it, and anything you add by hand is checked against both rules."],
  ["Assuming a course exists because it is on the curriculum sheet","The AIMS picker shows 596 of the 786 courses running this term. A course can be printed on your curriculum sheet, timetabled by the department, and still return \u201cNo records found\u201d when you search for it.","Anything known to be missing is labelled here. If a code returns nothing in AIMS, that is the department\u2019s to fix \u2014 email the DPGC the same day."],
  ["Missing the real deadline","The department email says 3 August. Every course record in AIMS says registration closes 31 July at 23:59. If you trust the email you lose three days you never had.","The earlier date is the one shown everywhere, and it goes into your calendar with a reminder."],

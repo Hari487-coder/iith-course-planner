@@ -71,7 +71,6 @@ which checks each block is still present.
 | `GLOSS` | Glossary term → `[title, plain-language definition]`. |
 | `MISTAKES` | The eight failure modes: `[name, what AIMS does, the guard here]`. |
 | `TITLECONFLICT` | Codes whose published title differs between sources. |
-| `SENIORS` | Electives previous batches took, from the orientation deck. |
 
 A course in `CUR` carries a status as its last field:
 `ok` registerable · `noslot` registerable but no published timings ·

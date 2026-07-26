@@ -80,23 +80,6 @@ var TYPEHINT = { core:"Departmental Core Theory", mgmt:"Departmental Elective",
     host.appendChild(tr);
   });
 })();
-(function seniors(){
-  var host=document.getElementById("seniorlist"); if(!host || typeof SENIORS==="undefined") return;
-  SENIORS.forEach(function(b){
-    var d=document.createElement("div"); d.className="fault";
-    var h='<div class="n">'+b[0]+' &middot; batch '+b[1]+'</div>';
-    h+='<div style="font-size:13px;line-height:1.9">';
-    b[2].forEach(function(c){
-      h += '&bull; '+c[0];
-      if(c[1]) h += ' <b class="mono" style="color:#0F766E">'+c[1]+'</b> <span style="color:#7C838C">slot '+c[2]+'</span>';
-      else if(c[2]) h += ' <span style="color:#7C838C">('+c[2]+')</span>';
-      else h += ' <span style="color:#B0B5BC">— no code given</span>';
-      h += '<br>';
-    });
-    h+='</div>';
-    d.innerHTML=h; host.appendChild(d);
-  });
-})();
 
 function renderGroups(){
   var host = $("groups"); host.innerHTML="";
@@ -714,7 +697,7 @@ function renderPreflight(){
     var m=el("div","blockmsg");
     m.appendChild(el("b",null, r.clashes.length ? "Fix the clash first" : "Nothing planned yet"));
     m.appendChild(document.createTextNode(
-      r.clashes.length ? "Two of your courses meet at the same time. Registering both is the one mistake AIMS will happily let you make."
+      r.clashes.length ? "Two of your courses meet at the same time. AIMS will flag this too — fix it here before you go into the form."
                        : "Tick your courses above and the exact AIMS steps will be written out here."));
     host.appendChild(m);
   } else {
